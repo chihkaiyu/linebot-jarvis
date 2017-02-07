@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 
 from bs4 import BeautifulSoup
-from urllib import urlopen
-from locationCode import country
+from urllib.request import urlopen
+from .locationCode import country
 
 def getWeather(location, period=None):
     if period:
@@ -10,7 +10,7 @@ def getWeather(location, period=None):
             format(country[location[0].encode('utf8')][location[1].encode('utf8')]))
     else:
         rawData = urlopen('http://www.cwb.gov.tw/V7/forecast/town368/3Hr/{}.htm'.\
-            format(country[location[0].encode('utf8')][location[1].encode('utf8')]))
+            format(country[location[0]][location[1]]))
     
     soup = BeautifulSoup(rawData, 'html.parser')
     divided = soup.find_all('tr')
@@ -60,17 +60,17 @@ def getWeather(location, period=None):
     display = ''.join(location) + '\n'
     if numCol[0] == 8:
         display += ''.join(date) + '\n'
-        display += u'時間    ' + u'溫度   ' + u'降雨機率' + '\n'
+        display += '時間    ' + '溫度   ' + '降雨機率' + '\n'
         for i in range(8):
             display += time[i] + '  ' + temp[i] + '     ' + rainprob[i] + '\n'
     else:
         for j in range(2):
             display += ''.join(date[j]) + '\n'
-            display += u'時間    ' + u'溫度   ' u'降雨機率' + '\n'
+            display += '時間    ' + '溫度   ' '降雨機率' + '\n'
             for i in range(numCol[j]):
                 display += time[i] + '  ' + temp[i] + '     ' + rainprob[i] + '\n'
     return display
 
 if __name__ == '__main__':
     location = ['台北', '內湖']
-    getWeather(location)
+    print(getWeather(location))
