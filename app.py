@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 
 import sys
 import os
@@ -67,12 +67,12 @@ def callback(environ, start_response):
             continue
 
         command = event.message.text.split(' ')
-        if command[0] == u'天氣':
+        if command[0] == '天氣':
             display = getWeather(command[1:])
-        elif command[0] == u'捷運':
+        elif command[0] == '捷運':
             display = getDuration(command[1:])
         else:
-            display = u'我聽不懂你在說什麼，你可以試試：天氣 台北 大安'
+            display = '我聽不懂你在說什麼，你可以試試：天氣 台北 大安'
         
         line_bot_api.reply_message(
             event.reply_token,
