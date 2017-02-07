@@ -11,3 +11,7 @@ in:
 	docker exec -ti linebot /bin/bash
 log:
 	docker logs linebot
+upgrade:
+	make stop
+	make build
+	make run

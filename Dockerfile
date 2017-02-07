@@ -12,7 +12,6 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 RUN pip install -r /opt/linebot/requirements.txt
 
 # bot module
-RUN mkdir /opt/linebot
 COPY app.py /opt/linebot/app.py
 COPY weatherParser /opt/linebot/weatherParser
 COPY metroParser /opt/linebot/metroParser

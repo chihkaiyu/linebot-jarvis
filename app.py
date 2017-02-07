@@ -69,7 +69,7 @@ def callback(environ, start_response):
         command = event.message.text.split(' ')
         if command[0] == u'天氣':
             display = getWeather(command[1:])
-        elif commad[0] == u'捷運':
+        elif command[0] == u'捷運':
             display = getDuration(command[1:])
         else:
             display = u'我聽不懂你在說什麼，你可以試試：天氣 台北 大安'
