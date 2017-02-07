@@ -55,9 +55,22 @@ def getWeather(location, period=None):
             rainprob.append(tmp[i].get_text())
             rainprob.append(tmp[i].get_text())
         rainprob.append(tmp[5].get_text())
-        
-    res = {'numCol': numCol, 'date': date, 'time': time, 'temp': temp, 'rainprob': rainprob}
-    return res
+    
+    # typesetting result
+    display = ''
+    if numCol[0] == 8:
+        display += ''.join(date) + '\n'
+        display += u'時間    ' + u'溫度   ' + u'降雨機率' + '\n'
+        for i in range(8):
+            display += time[i] + '  ' + temp[i] + '     ' + rainprob[i] + '\n'
+    else:
+        for j in range(2):
+            display += ''.join(date[j]) + '\n'
+            display += u'時間    ' + u'溫度   ' u'降雨機率' + '\n'
+            for i in range(numCol[j]):
+                display += time[i] + '  ' + temp[i] + '     ' + rainprob[i] + '\n'
+    return display
+
 if __name__ == '__main__':
     location = ['台北', '內湖']
     getWeather(location)

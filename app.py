@@ -67,20 +67,10 @@ def callback(environ, start_response):
 
         command = event.message.text.split(' ')
         if command[0] == u'天氣':
-            res = getWeather(command[1:])
-            display = ''.join(command[1:]) + '\n'
-            if res['numCol'] == 8:
-                display += ''.join(res['date']) + '\n'
-                display += u'時間    ' + u'溫度   ' + u'降雨機率' + '\n'
-                for i in range(8):
-                    display += res['time'][i] + '  ' + res['temp'][i] + '     ' + res['rainprob'][i] + '\n'
-            else:
-                for j in range(2):
-                    display += ''.join(res['date'][j]) + '\n'
-                    display += u'時間    ' + u'溫度   ' u'降雨機率' + '\n'
-                    for i in range(res['numCol'][j]):
-                        display += res['time'][i] + '  ' + res['temp'][i] + '     ' + res['rainprob'][i] + '\n'
-
+            display = ''.join(command[1:]) + '\n' + getWeather(command[1:])
+        else:
+            display = u'我聽不懂你在說什麼，你可以試試：天氣 台北 大安'
+        
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=display)
