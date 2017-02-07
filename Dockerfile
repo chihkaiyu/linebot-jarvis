@@ -5,15 +5,19 @@ ENV CHANNEL_ACCESS_TOKEN S/4X9lo2HMDHCXo+S3PHrihkrJaFNPrRfKyNXPoliEPXX4Tt80aaoAL
 
 ENV CHANNEL_SECRET 3a2311af95ef08db962704516fc4c3fd
 
-RUN mkdir /opt/linebot
 RUN apt-get update && apt-get install -y supervisor python-pip
 COPY requirements.txt /opt/linebot/requirements.txt
 COPY default.conf /etc/nginx/conf.d/default.conf
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 RUN pip install -r /opt/linebot/requirements.txt
+
+# bot module
+RUN mkdir /opt/linebot
 COPY app.py /opt/linebot/app.py
 COPY weatherParser /opt/linebot/weatherParser
+COPY metroParser /opt/linebot/metroParser
 
+# write log into file
 RUN unlink /var/log/nginx/access.log
 RUN unlink /var/log/nginx/error.log
 
