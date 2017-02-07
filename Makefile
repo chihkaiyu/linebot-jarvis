@@ -9,3 +9,5 @@ rm:
 	docker rm linebot
 in:
 	docker exec -ti linebot /bin/bash
+log:
+	docker logs linebot
