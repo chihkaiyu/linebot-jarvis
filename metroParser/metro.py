@@ -5,8 +5,9 @@ from bs4 import BeautifulSoup
 from urllib import urlopen
 
 def getDuration(location):
-    rawData = urlopen('http://web.metro.taipei/c/2stainfo.asp?s1elect={}&action=query&s2elect={}&submit=%C2%A0%E7%A2%BA%E5%AE%9A%C2%A0'.\
-        format(station[location[0]], station[location[1]]))
+    rawData = urlopen('http://web.metro.taipei/c/2stainfo.asp?s1elect={}&action=query\
+            &s2elect={}&submit=%C2%A0%E7%A2%BA%E5%AE%9A%C2%A0'.\
+            format(station[location[0].encode('utf8')], station[location[1].encode('utf8')]))
     
     soup = BeautifulSoup(rawData, 'html.parser')
     divided = soup.find_all('div')
