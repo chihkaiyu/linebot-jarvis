@@ -57,7 +57,7 @@ def getWeather(location, period=None):
         rainprob.append(tmp[5].get_text())
     
     # typesetting result
-    display = ''
+    display = ''.join(location) + '\n'
     if numCol[0] == 8:
         display += ''.join(date) + '\n'
         display += u'時間    ' + u'溫度   ' + u'降雨機率' + '\n'
