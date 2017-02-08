@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf8 -*-
 
 country = {'台北': {'松山': '6300100',
                    '信義': '6300200',
