@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf8 -*-
 
-from .metroCode import station
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
+from configparser import ConfigParser
+import os
 
 def getDuration(location):
+    conf = ConfigParser()
+    conf.read(os.path.join(os.getcwd(), 'metroCode.ini'))
+    sta = conf['station']
     url = 'http://web.metro.taipei/c/2stainfo.asp?s1elect={}&action=query&s2elect={}&submit=%C2%A0%E7%A2%BA%E5%AE%9A%C2%A0'.\
-        format(station[location[0]], station[location[1]])
+        format(sta[location[0]], sta[location[1]])
     rawData = urlopen(url)
     
     soup = BeautifulSoup(rawData, 'html.parser')

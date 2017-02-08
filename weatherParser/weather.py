@@ -3,15 +3,13 @@
 
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
-from .locationCode import country
+from configparser import ConfigParser
 
 def getWeather(location, period=None):
-    if period:
-        rawData = urlopen('http://www.cwb.gov.tw/V7/forecast/town368/7Day/{}.htm'.\
-            format(country[location[0].encode('utf8')][location[1].encode('utf8')]))
-    else:
-        rawData = urlopen('http://www.cwb.gov.tw/V7/forecast/town368/3Hr/{}.htm'.\
-            format(country[location[0]][location[1]]))
+    conf = ConfigParser()
+    conf.read('countyCode.ini')
+    rawData = urlopen('http://www.cwb.gov.tw/V7/forecast/town368/3Hr/{}.htm'.\
+            format(conf[location[0]][location[1]]))
     
     soup = BeautifulSoup(rawData, 'html.parser')
     divided = soup.find_all('tr')
@@ -68,5 +66,5 @@ def getWeather(location, period=None):
     return display
 
 if __name__ == '__main__':
-    location = ['台北', '內湖']
+    location = ['臺北', '內湖']
     print(getWeather(location))
