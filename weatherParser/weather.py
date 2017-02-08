@@ -17,17 +17,14 @@ def getWeather(location, period=None):
     
     # parse date at 0
     tmp = divided[0].find_all('td', limit=3)
-    numCol = []
     date = []
     date.append(tmp[1].get_text())
     if tmp[1].get('colspan'):
-        numCol.append(int(tmp[1]['colspan']))
-        if numCol[0] != 8:
-            numCol.append(int(tmp[2]['colspan']))
+        numCol = int(tmp[1]['colspan'])
+        if numCol != 8:
             date.append(tmp[2].get_text())
     else:
-        numCol.append(1)
-        numCol.append(7)
+        numCol = 1
         date.append(tmp[2].get_text())
 
     # parse time at 1
@@ -58,17 +55,15 @@ def getWeather(location, period=None):
     
     # typesetting result
     display = ''.join(location) + '\n'
-    if numCol[0] == 8:
-        display += ''.join(date) + '\n'
-        display += '時間    ' + '溫度   ' + '降雨機率' + '\n'
-        for i in range(8):
+    display += ''.join(date[0]) + '\n'
+    display += '時間    ' + '溫度   ' + '降雨機率' + '\n'
+    for i in range(numCol):
+        display += time[i] + '  ' + temp[i] + '     ' + rainprob[i] + '\n'
+    if numCol != 8:
+        display += ''.join(date[1]) + '\n'
+        display += '時間    ' + '溫度   ' '降雨機率' + '\n'
+        for i in range(numCol ,8):
             display += time[i] + '  ' + temp[i] + '     ' + rainprob[i] + '\n'
-    else:
-        for j in range(2):
-            display += ''.join(date[j]) + '\n'
-            display += '時間    ' + '溫度   ' '降雨機率' + '\n'
-            for i in range(numCol[j]):
-                display += time[i] + '  ' + temp[i] + '     ' + rainprob[i] + '\n'
     return display
 
 if __name__ == '__main__':
