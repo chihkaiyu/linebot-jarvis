@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: utf8 -*-
 
 station = {'動物園': 'BR01-019',
