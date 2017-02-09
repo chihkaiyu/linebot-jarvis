@@ -4,12 +4,14 @@
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 from configparser import ConfigParser
+import os
 
 def getWeather(location, period=None):
     conf = ConfigParser()
-    conf.read('countyCode.ini')
-    rawData = urlopen('http://www.cwb.gov.tw/V7/forecast/town368/3Hr/{}.htm'.\
-            format(conf[location[0]][location[1]]))
+    abspath = os.path.dirname(os.path.abspath(__file__))
+    conf.read(os.path.join(abspath, 'countyCode.ini'))
+    rawData = (urlopen('http://www.cwb.gov.tw/V7/forecast/town368/3Hr/{}.htm'.
+            format(conf[location[0]][location[1]])))
     
     soup = BeautifulSoup(rawData, 'html.parser')
     divided = soup.find_all('tr')
