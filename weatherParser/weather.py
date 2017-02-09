@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-# -*- coding: utf8 -*-
+# -*- coding: utf-8 -*-
 
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 from configparser import ConfigParser
 import os
 
-def getWeather(location, period=None):
+def getWeather(location):
     conf = ConfigParser()
     abspath = os.path.dirname(os.path.abspath(__file__))
-    conf.read(os.path.join(abspath, 'countyCode.ini'))
+    conf.read(os.path.join(abspath, 'countyCode.ini'), encoding='utf8')
     rawData = (urlopen('http://www.cwb.gov.tw/V7/forecast/town368/3Hr/{}.htm'.
             format(conf[location[0]][location[1]])))
     

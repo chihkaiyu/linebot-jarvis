@@ -3,8 +3,8 @@
 
 import sys
 import os
-from weatherParser.weather import *
-from metroParser.metro import *
+from weatherParser import weather
+from metroParser import metro
 
 from linebot import (
     LineBotApi, WebhookParser
@@ -69,9 +69,9 @@ def callback(environ, start_response):
 
         command = event.message.text.split(' ')
         if command[0] == '天氣':
-            display = getWeather(command[1:])
+            display = weather.getWeather(command[1:])
         elif command[0] == '捷運':
-            display = getDuration(command[1:])
+            display = metro.getDuration(command[1:])
         else:
             display = '我聽不懂你在說什麼，你可以試試：天氣 台北 大安'
         
