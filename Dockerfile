@@ -5,11 +5,10 @@ ENV CHANNEL_ACCESS_TOKEN S/4X9lo2HMDHCXo+S3PHrihkrJaFNPrRfKyNXPoliEPXX4Tt80aaoAL
 
 ENV CHANNEL_SECRET 3a2311af95ef08db962704516fc4c3fd
 
-
 RUN apt-get update && apt-get install -y python3 supervisor python3-pip
-COPY requirements.txt /opt/linebot/requirements.txt
-COPY default.conf /etc/nginx/conf.d/default.conf
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY conf/requirements.txt /opt/linebot/requirements.txt
+COPY conf/default.conf /etc/nginx/conf.d/default.conf
+COPY conf/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 RUN pip3 install -r /opt/linebot/requirements.txt
 
 # bot module
