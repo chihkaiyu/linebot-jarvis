@@ -8,8 +8,8 @@ import os
 
 def getWeather(location):
     conf = ConfigParser()
-    abspath = os.path.dirname(os.path.abspath(__file__))
-    conf.read(os.path.join(abspath, 'countyCode.ini'), encoding='utf8')
+    parDir = os.path.dirname(os.path.abspath(__file__))
+    conf.read(os.path.join(parDir, 'countyCode.ini'), encoding='utf8')
     rawData = (urlopen('http://www.cwb.gov.tw/V7/forecast/town368/3Hr/{}.htm'.
             format(conf[location[0]][location[1]])))
     

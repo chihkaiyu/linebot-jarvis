@@ -8,11 +8,11 @@ import os
 
 def getDuration(location):
     conf = ConfigParser()
-    abspath = os.path.dirname(os.path.abspath(__file__))
-    conf.read(os.path.join(abspath, 'metroCode.ini'), encoding='utf8')
+    parDir = os.path.dirname(os.path.abspath(__file__))
+    conf.read(os.path.join(parDir, 'metroCode.ini'), encoding='utf8')
     sta = conf['station']
-    url = 'http://web.metro.taipei/c/2stainfo.asp?s1elect={}&action=query&s2elect={}&submit=%C2%A0%E7%A2%BA%E5%AE%9A%C2%A0'.\
-        format(sta[location[0]], sta[location[1]])
+    url = ('http://web.metro.taipei/c/2stainfo.asp?s1elect={}&action=query&s2elect={}&submit=%C2%A0%E7%A2%BA%E5%AE%9A%C2%A0'.
+        format(sta[location[0]], sta[location[1]]))
     rawData = urlopen(url)
     
     soup = BeautifulSoup(rawData, 'html.parser')
@@ -27,7 +27,7 @@ def getDuration(location):
     duration = divided[11].get_text()
     howto = divided[12].get_text()
 
-    display = u'{} => {}\n'.format(location[0], location[1])
+    display = '{} => {}\n'.format(location[0], location[1])
     display += '票價\n'
     display += '單程票: {}\n'.format(prices[0])
     display += '電子票證: {}\n'.format(prices[1])
