@@ -8,7 +8,8 @@ import os
 
 def getDuration(location):
     conf = ConfigParser()
-    conf.read(os.path.join(os.getcwd(), 'metroCode.ini'))
+    abspath = os.path.dirname(os.path.abspath(__file__))
+    conf.read(os.path.join(abspath, 'metroCode.ini'))
     sta = conf['station']
     url = 'http://web.metro.taipei/c/2stainfo.asp?s1elect={}&action=query&s2elect={}&submit=%C2%A0%E7%A2%BA%E5%AE%9A%C2%A0'.\
         format(sta[location[0]], sta[location[1]])
