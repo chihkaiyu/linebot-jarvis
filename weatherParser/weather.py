@@ -77,6 +77,7 @@ def getWeather(location):
     # delete this after done all feature
     #================================#
     if not aqi:
+        site = 'Can not find this district.'
         aqi = 'Can not find this district.'
         aqiStyle = 'Can not find this district.'
     #================================#
@@ -115,7 +116,7 @@ def getWeather(location):
     return display
 
 if __name__ == '__main__':
-    location = ['新北', '新莊']
+    location = ['臺北', '大安']
     print(getWeather(location))
 
 '''
