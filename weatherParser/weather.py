@@ -7,6 +7,7 @@ from configparser import ConfigParser
 import os
 
 def getWeather(location):
+    # get weather
     conf = ConfigParser()
     parDir = os.path.dirname(os.path.abspath(__file__))
     conf.read(os.path.join(parDir, 'countyCode.ini'), encoding='utf8')
@@ -53,6 +54,9 @@ def getWeather(location):
             rainprob.append(tmp[i].get_text())
             rainprob.append(tmp[i].get_text())
         rainprob.append(tmp[5].get_text())
+
+    # get AQI
+    # http://taqm.epa.gov.tw/taqm/aqs.ashx?lang=tw&act=aqi-epa
     
     # typesetting result
     display = ''.join(location) + '\n'
