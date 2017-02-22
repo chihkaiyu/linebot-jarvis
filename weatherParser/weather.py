@@ -8,17 +8,6 @@ import os
 import json
 import math
 
-def findNearest(s, f):
-    # load longtitude and latitude of query dist.
-    county = ConfigParser()
-    county.read(os.path.join(parDir, 'countyLongLat.ini'), encoding='utf8')
-    coordinate = county[location[0]][location[1]].split()
-    lat, lon = int(coordinate[0]), int(coordinate[1])
-    defCounty = ConfigParser()
-    defCounty.read(os.path.join(parDir))
-
-
-
 
 def getWeather(location):
     # get weather
