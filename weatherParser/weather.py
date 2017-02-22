@@ -6,6 +6,19 @@ from urllib.request import urlopen
 from configparser import ConfigParser
 import os
 import json
+import math
+
+def findNearest(s, f):
+    # load longtitude and latitude of query dist.
+    county = ConfigParser()
+    county.read(os.path.join(parDir, 'countyLongLat.ini'), encoding='utf8')
+    coordinate = county[location[0]][location[1]].split()
+    lat, lon = int(coordinate[0]), int(coordinate[1])
+    defCounty = ConfigParser()
+    defCounty.read(os.path.join(parDir))
+
+
+
 
 def getWeather(location):
     # get weather
@@ -58,30 +71,53 @@ def getWeather(location):
 
     # get AQI
     # http://taqm.epa.gov.tw/taqm/aqs.ashx?lang=tw&act=aqi-epa
-    conf.read(os.path.join(parDir, 'defCountyLongLat.ini'), encoding='utf8')
     rawData = urlopen('http://taqm.epa.gov.tw/taqm/aqs.ashx?lang=tw&act=aqi-epa')
     res = json.loads(rawData.read().decode('utf8'))['Data']
-    aqi = False
+
+    # check query dist whether in default county
+    defCounty = ConfigParser()
+    defCounty.read(os.path.join(parDir, 'defCountyLongLat.ini'), encoding='utf8')
+    if not defCounty.has_option(location[0], location[1]):
+        # caculate distance between all location in defCountyLongLat.ini
+        # find out the nearest district, and use it as result.
+        # load longtitude and latitude of query dist.
+        county = ConfigParser()
+        county.read(os.path.join(parDir, 'countyLongLat.ini'), encoding='utf8')
+        coordinate = county[location[0]][location[1]].split()
+        lamS, phiS = float(coordinate[0]), float(coordinate[1])
+
+        # calculate distance of every station in the same county
+        min = 1000
+        for dist in defCounty.items(location[0]):
+            tmp = dist[1].split()
+            lamF, phiF = float(tmp[0]), float(tmp[1])
+            deltaPhi = abs(phiS-phiF)
+            deltaLam = abs(lamS-lamF)
+            deltaLo = 2*math.asin(math.sqrt(math.sin(deltaPhi/2)**2+math.cos(phiS)*math.cos(phiF)*math.sin(deltaLam/2)**2))
+            if deltaLo < min:
+                min = deltaLo
+                site = dist[0]
+    else:
+        site = location[1]
+
+    # get obeservation data
     for dist in res:
-        if location[1] == dist['SiteName']:
-            site = dist['SiteName']
+        if site == dist['SiteName']:
+            # site = dist['SiteName']
             aqi = dist['AQI']
             aqiStyle = dist['AQIStyle']
             break;
-        '''
-        else
-            caculate distance between all location in defCountyLongLat.ini
-            find out the nearest district, and use it as result.
-        '''
 
     # delete this after done all feature
+    '''
     #================================#
     if not aqi:
         site = 'Can not find this district.'
         aqi = 'Can not find this district.'
         aqiStyle = 'Can not find this district.'
     #================================#
-    
+    '''
+
     if aqiStyle == 'AQI0':
         aqiStyle = '設備維護'
     elif aqiStyle == 'AQI1':
@@ -116,7 +152,7 @@ def getWeather(location):
     return display
 
 if __name__ == '__main__':
-    location = ['臺北', '大安']
+    location = ['雲林', '斗南']
     print(getWeather(location))
 
 '''
