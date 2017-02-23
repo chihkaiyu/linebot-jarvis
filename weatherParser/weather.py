@@ -6,15 +6,21 @@ from urllib.request import urlopen
 from configparser import ConfigParser
 import os
 import json
-import math
+#import fuzzywuzzy
+from fuzzywuzzy import process
 
 
 def getWeather(query):
-    # get weather
-    #conf = ConfigParser()
+    # replace 台 to 臺
+    query[0] = query[0].replace('台', '臺')
+    query[1] = query[1].replace('台', '臺')
+
+    ## get weather
     parDir = os.path.dirname(os.path.abspath(__file__))
-    #conf.read(os.path.join(parDir, 'distInfo.ini'), encoding='utf8')
     conf = json.load(open(os.path.join(parDir, 'distInfo.json'), 'r', encoding='utf8'))
+    # approximate matching
+    query[0] = process.extractOne(query[0], conf.keys())[0]
+    query[1] = process.extractOne(query[1], conf[query[0]].keys())[0]
     countyCode = conf[query[0]][query[1]][0]
     rawData = (urlopen('http://www.cwb.gov.tw/V7/forecast/town368/3Hr/{countyCode}.htm'.
             format(countyCode=countyCode)))
@@ -109,5 +115,5 @@ def getWeather(query):
     return display
 
 if __name__ == '__main__':
-    query = ['臺北市', '大安區']
+    query = ['台中', '豐原市']
     print(getWeather(query))
