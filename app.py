@@ -69,9 +69,14 @@ def callback(environ, start_response):
 
         command = event.message.text.split(' ')
         if command[0] == '天氣':
+            if len(command) < 3:
+                command.append(command[-1])
             display = weather.getWeather(command[1:])
         elif command[0] == '捷運':
-            display = metro.getDuration(command[1:])
+            if len(command) < 3:
+                display = '請輸入兩個車站。'
+            else:
+                display = metro.getDuration(command[1:])
         else:
             display = '我聽不懂你在說什麼，你可以試試：天氣 台北 大安'
         
