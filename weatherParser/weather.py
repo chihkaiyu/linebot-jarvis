@@ -9,13 +9,15 @@ import json
 import math
 
 
-def getWeather(location):
+def getWeather(query):
     # get weather
-    conf = ConfigParser()
+    #conf = ConfigParser()
     parDir = os.path.dirname(os.path.abspath(__file__))
-    conf.read(os.path.join(parDir, 'countyCode.ini'), encoding='utf8')
-    rawData = (urlopen('http://www.cwb.gov.tw/V7/forecast/town368/3Hr/{}.htm'.
-            format(conf[location[0]][location[1]])))
+    #conf.read(os.path.join(parDir, 'distInfo.ini'), encoding='utf8')
+    conf = json.load(open(os.path.join(parDir, 'distInfo.json'), 'r', encoding='utf8'))
+    countyCode = conf[query[0]][query[1]][0]
+    rawData = (urlopen('http://www.cwb.gov.tw/V7/forecast/town368/3Hr/{countyCode}.htm'.
+            format(countyCode=countyCode)))
     
     soup = BeautifulSoup(rawData, 'html.parser')
     divided = soup.find_all('tr')
@@ -61,51 +63,11 @@ def getWeather(location):
     # get AQI
     # http://taqm.epa.gov.tw/taqm/aqs.ashx?lang=tw&act=aqi-epa
     rawData = urlopen('http://taqm.epa.gov.tw/taqm/aqs.ashx?lang=tw&act=aqi-epa')
+    stationID = int(conf[query[0]][query[1]][1])
     res = json.loads(rawData.read().decode('utf8'))['Data']
-
-    # check query dist whether in default county
-    defCounty = ConfigParser()
-    defCounty.read(os.path.join(parDir, 'defCountyLongLat.ini'), encoding='utf8')
-    if not defCounty.has_option(location[0], location[1]):
-        # caculate distance between all location in defCountyLongLat.ini
-        # find out the nearest district, and use it as result.
-        # load longtitude and latitude of query dist.
-        county = ConfigParser()
-        county.read(os.path.join(parDir, 'countyLongLat.ini'), encoding='utf8')
-        coordinate = county[location[0]][location[1]].split()
-        lamS, phiS = float(coordinate[0]), float(coordinate[1])
-
-        # calculate distance of every station in the same county
-        min = 1000
-        for dist in defCounty.items(location[0]):
-            tmp = dist[1].split()
-            lamF, phiF = float(tmp[0]), float(tmp[1])
-            deltaPhi = abs(phiS-phiF)
-            deltaLam = abs(lamS-lamF)
-            deltaLo = 2*math.asin(math.sqrt(math.sin(deltaPhi/2)**2+math.cos(phiS)*math.cos(phiF)*math.sin(deltaLam/2)**2))
-            if deltaLo < min:
-                min = deltaLo
-                site = dist[0]
-    else:
-        site = location[1]
-
-    # get obeservation data
-    for dist in res:
-        if site == dist['SiteName']:
-            # site = dist['SiteName']
-            aqi = dist['AQI']
-            aqiStyle = dist['AQIStyle']
-            break;
-
-    # delete this after done all feature
-    '''
-    #================================#
-    if not aqi:
-        site = 'Can not find this district.'
-        aqi = 'Can not find this district.'
-        aqiStyle = 'Can not find this district.'
-    #================================#
-    '''
+    aqi = res[stationID]['AQI']
+    aqiStyle = res[stationID]['AQIStyle']
+    site = res[stationID]['SiteName']
 
     if aqiStyle == 'AQI0':
         aqiStyle = '設備維護'
@@ -123,40 +85,29 @@ def getWeather(location):
         aqiStyle = '危害'
 
     # typesetting result
-    display = ''.join(location) + '\n'
-    display += '空氣品質：\n'
-    display += '    觀測站: ' + site + '\n'
-    display += '    AQI: ' + aqi + '\n'
-    display += '    空氣品質指標： ' + aqiStyle + '\n'
-    display += ''.join(date[0]) + '\n'
-    display += '    時間    ' + '溫度   ' + '降雨機率' + '\n'
+    display = ('{queryDist}\n'
+                '空氣品質: \n'
+                '    觀測站: {site}\n'
+                '    AQI: {aqi}\n'
+                '    空氣品質指標: {quality}\n'
+                '{d}\n'
+                '    時間    溫度   降雨機率\n'
+                .format(queryDist=' '.join(query), site=site, aqi=aqi, quality=aqiStyle,
+                        d='{} {}'.format(date[0][:5], date[0][5:])))
+
     for i in range(numCol):
-        display += '    ' + time[i] + '  ' + temp[i] + '     ' + rainprob[i] + '\n'
+        display += ('    {time}  {temp}     {rain}\n'
+                    .format(time=time[i], temp=temp[i], rain=rainprob[i]))
     if numCol != 8:
-        display += ''.join(date[1]) + '\n'
-        display += '    時間    ' + '溫度   ' '降雨機率' + '\n'
+        display += ('{date} {day}\n'
+                    '    時間    溫度   降雨機率\n'
+                    .format(date=date[1][:5], day=date[1][5:]))
         for i in range(numCol ,8):
-            display += '    ' + time[i] + '  ' + temp[i] + '     ' + rainprob[i] + '\n'
+            display += ('    {time}  {temp}     {rain}\n'
+                        .format(time=time[i], temp=temp[i], rain=rainprob[i]))
 
     return display
 
 if __name__ == '__main__':
-    location = ['雲林', '斗南']
-    print(getWeather(location))
-
-'''
-    # typesetting result
-    display = ''.join(location) + '\n'
-    display += '空氣品質：\n'
-    display += '    AQI: ' + aqi + '\n'
-    display += '    空氣品質指標： ' + aqiStyle + '\n'
-    display += ''.join(date[0]) + '\n'
-    display += '時間    ' + '溫度   ' + '降雨機率' + '\n'
-    for i in range(numCol):
-        display += time[i] + '  ' + temp[i] + '     ' + rainprob[i] + '\n'
-    if numCol != 8:
-        display += ''.join(date[1]) + '\n'
-        display += '時間    ' + '溫度   ' '降雨機率' + '\n'
-        for i in range(numCol ,8):
-            display += time[i] + '  ' + temp[i] + '     ' + rainprob[i] + '\n'
-'''
+    query = ['臺北市', '大安區']
+    print(getWeather(query))
