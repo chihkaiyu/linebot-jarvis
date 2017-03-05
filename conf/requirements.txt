@@ -2,3 +2,4 @@ gunicorn
 line-bot-sdk
 BeautifulSoup4
 fuzzywuzzy
+mysql-connector
