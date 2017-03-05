@@ -31,13 +31,6 @@ class lineServer(object):
         self.parser = WebhookParser(channel_secret)
 
     def callback(self, environ, start_response):
-        '''
-        # for ELB
-        if environ['PATH_INFO'] == '/callback' and environ['REQUEST_METHOD'] == 'GET':
-            start_response('200 OK', [])
-            return create_body('OK')
-        '''
-        
         # check request path
         if environ['PATH_INFO'] != '/callback':
             start_response('404 Not Found', [])
@@ -82,7 +75,6 @@ class lineServer(object):
                     display = metro.getDuration(command[1:])
             else:
                 display = '我聽不懂你在說什麼，你可以試試：天氣 台北 大安'
-            
             self.line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text=display)
