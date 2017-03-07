@@ -138,12 +138,12 @@ def getWeather(query):
     # precise prediction
     for dayIdx in range(2):
         display += ('{D}\n'
-                    '    時間    溫度   降雨機率\n'
+                    '    時間    溫度     降雨機率\n'
                     .format(D='{} {}'.format(res[dayIdx]['date'][:5], res[dayIdx]['date'][5:])))
         for time, temp, rain in (zip(res[dayIdx]['time'], 
                                     res[dayIdx]['temp'], 
                                     res[dayIdx]['condition'])):
-            display += ('    {TIME}   {TEMP}     {RAIN}\n'
+            display += ('    {TIME}   {TEMP}       {RAIN}\n'
                         .format(TIME=time, TEMP=temp, RAIN=rain))
     # rough prediction
     for dayIdx in range(2, 7):
@@ -153,7 +153,7 @@ def getWeather(query):
         for time, temp, cond in (zip(res[dayIdx]['time'], 
                                     res[dayIdx]['temp'], 
                                     res[dayIdx]['condition'])):
-            display += ('    {TIME}    {TEMP}  {COND}\n'
+            display += ('    {TIME}    {TEMP}    {COND}\n'
                         .format(TIME=time, TEMP=temp, COND=cond))
     '''
     for i in range(numCol):
@@ -171,8 +171,5 @@ def getWeather(query):
 
 
 if __name__ == '__main__':
-    #import pprint
     query = ['台中', '豐原市']
-    #pp = pprint.PrettyPrinter(indent=4)
-    #pprint.pprint(getWeather(query))
     print(getWeather(query))
