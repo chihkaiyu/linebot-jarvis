@@ -62,12 +62,23 @@ class lineServer(object):
                 continue
             if not isinstance(event.message, TextMessage):
                 continue
-            
-            result = self.executeCmd(event.message.text.split())
+
+            command = event.message.text.split()
+            if command[0] == '天氣':
+                if len(command) < 3:
+                    command.append(command[-1])
+                display = weather.getWeather(command[1:])
+            elif command[0] == '捷運':
+                if len(command) < 3:
+                    display = '請輸入兩個車站。'    
+                else:
+                    display = metro.getDuration(command[1:])
+            else:
+                display = '我聽不懂你在說什麼，你可以試試：天氣 台北 大安'
             
             self.line_bot_api.reply_message(
                 event.reply_token,
-                TextSendMessage(text=result)
+                TextSendMessage(text=display)
             )
 
         start_response('200 OK', [])
@@ -79,24 +90,5 @@ class lineServer(object):
         else:
             return text
 
-    def executeCmd(command):
-        if command[0] == '天氣':
-            if len(command) < 3:
-                command.append(command[-1])
-            display = weather.getWeather(command[1:])
-        elif command[0] == '捷運':
-            if len(command) < 3:
-                display = '請輸入兩個車站。'    
-            else:
-                display = metro.getDuration(command[1:])
-        else:
-            display = '我聽不懂你在說什麼，你可以試試：天氣 台北 大安'
-        return display
-
-
 lineInstance = lineServer()
 callback = lineInstance.callback
-
-if __name__ == '__main__':
-    cmd = '天氣 台北 大安'
-    print(executeCmd(cmd))
