@@ -92,3 +92,6 @@ class lineServer(object):
 
 lineInstance = lineServer()
 callback = lineInstance.callback
+
+if __name__ == '__main__':
+    
