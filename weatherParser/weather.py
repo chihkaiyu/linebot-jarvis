@@ -32,6 +32,7 @@ def getWeather(query):
     soup = BeautifulSoup(rawData, 'html.parser')
     threeHour = soup.find_all('tr')
 
+    # get 7 days result
     rawData = (urlopen('http://www.cwb.gov.tw/V7/forecast/town368/7Day/{countyCode}.htm'.
             format(countyCode=countyCode)))
     soup = BeautifulSoup(rawData, 'html.parser')
@@ -42,7 +43,7 @@ def getWeather(query):
     # date: 0, time: 1, temperature: 3, rainfall prob.: 8
     # seven days
     # date: 0, time: 1, high temp: 3, low temp: 4, condition: 2
-    checkColspan = lambda col: int(col) if col else 1
+    getColspan = lambda col: int(col) if col else 1
     ceil = lambda num: int(num/2)+1 if num%2 != 0 else int(num/2)
     soupDate = threeHour[0].find_all('td', limit=3)[1:]
     tmpSeven = sevenDay[0].find_all('td')[1:]
@@ -56,48 +57,47 @@ def getWeather(query):
     # collect date and numCol
     res = []
     for day in soupDate:
-        res.append({'numCol': checkColspan(day.get('colspan')),
+        res.append({'numCol': getColspan(day.get('colspan')),
                     'date': day.get_text(),
                     'time': [],
                     'temp': [],
                     'condition': []})
-    #date = [d.get_text() for d in soupDate]
-    #numCol = [checkColspan(n.get('colspan')) for n in soupDate]
     
-    tmpRange = checkColspan(soupDate[0].get('colspan')) + checkColspan(soupDate[1].get('colspan'))
-    #time = [t.get_text() for t in threeHour[1].find_all('td')[1:(1+tmpRange)] + \
-    #                                sevenDay[1].find_all('td')[ran:ran+10]]
+    # get the result we want
+    tmpRange = getColspan(soupDate[0].get('colspan')) + getColspan(soupDate[1].get('colspan'))
     soupTime = threeHour[1].find_all('td')[1:(1+tmpRange)] + sevenDay[1].find_all('td')[ran:ran+10]
-    #soupTemp = threeHour[3].find_all('td')[1:(1+tmpRange)]
-    #soupHighTemp = sevenDay[3].find_all('td')[ran:ran+10]
-    #soupLowTemp = sevenDay[4].find_all('td')[ran:ran+10]
-    
-    #soupRain = threeHour[8].find_all('td')[1:1+ceil(tmpRange)]
-    #soupCond = sevenDay[2].find_all('img')[ran-1:ran+9]
+    soupTemp = threeHour[3].find_all('td')[1:(1+tmpRange)]
+    soupRain = threeHour[8].find_all('td')[1:1+ceil(tmpRange)]
+    soupHighTemp = sevenDay[3].find_all('td')[ran:ran+10]
+    soupLowTemp = sevenDay[4].find_all('td')[ran:ran+10]
+    soupCond = sevenDay[2].find_all('img')[ran-1:ran+9]
 
     
+    # comb the result
+    # forecast time
+    forecastTime = [t.get_text() for t in soupTime]
+
     # duplicate rainfall probability
     cond = []
-    for r in threeHour[8].find_all('td')[1:1+ceil(tmpRange)]:
+    for r in soupRain:
         if r.get('colspan'):
             cond.extend([r.get_text(), r.get_text()])
         else:
             cond.append(r.get_text())
-    cond.extend([c['title'] for c in sevenDay[2].find_all('img')[ran-1:ran+9]])
+    cond.extend([c['title'] for c in soupCond])
 
     # concatenate temp
-    temp = [t.get_text() for t in threeHour[3].find_all('td')[1:(1+tmpRange)]]
+    temp = [t.get_text() for t in soupTemp]
     temp.extend(['{}~{}'.format(lTemp.get_text(), hTemp.get_text()) \
-                    for lTemp, hTemp in zip(sevenDay[4].find_all('td')[ran:ran+10], \
-                                            sevenDay[3].find_all('td')[ran:ran+10])])
+                    for lTemp, hTemp in zip(soupLowTemp, soupHighTemp)])
     # collect data
     start = 0
-    for day in range(7):
-        for col in range(start, start+res[day]['numCol']):
-            res[day]['time'].append(soupTime[col].get_text())
-            res[day]['temp'].append(temp[col])
-            res[day]['condition'].append(cond[col])
-        start += res[day]['numCol']
+    for dayIdx in range(7):
+        end = start+res[dayIdx]['numCol']
+        res[dayIdx]['time'].extend(forecastTime[start:end])
+        res[dayIdx]['temp'].extend(temp[start:end])
+        res[dayIdx]['condition'].extend(cond[start:end])
+        start += res[dayIdx]['numCol']
 
 
     # get AQI
@@ -105,9 +105,6 @@ def getWeather(query):
     rawData = urlopen('http://taqm.epa.gov.tw/taqm/aqs.ashx?lang=tw&act=aqi-epa')
     stationID = int(conf[query[0]][query[1]][1])
     aqiData = json.loads(rawData.read().decode('utf8'))['Data']
-    #res['aqi'] = aqiData[stationID]['AQI']
-    #res['aqiStyle'] = aqiData[stationID]['AQIStyle']
-    #res['site'] = aqiData[stationID]['SiteName']
     res.append({'aqiStyle': aqiData[stationID]['AQIStyle'],
                 'site': aqiData[stationID]['SiteName']})
 
@@ -155,18 +152,6 @@ def getWeather(query):
                                     res[dayIdx]['condition'])):
             display += ('    {TIME}    {TEMP}    {COND}\n'
                         .format(TIME=time, TEMP=temp, COND=cond))
-    '''
-    for i in range(numCol):
-        display += ('    {time}  {temp}     {rain}\n'
-                    .format(time=time[i], temp=temp[i], rain=rainprob[i]))
-    if numCol != 8:
-        display += ('{date} {day}\n'
-                    '    時間    溫度   降雨機率\n'
-                    .format(date=date[1][:5], day=date[1][5:]))
-        for i in range(numCol ,8):
-            display += ('    {time}  {temp}     {rain}\n'
-                        .format(time=time[i], temp=temp[i], rain=rainprob[i]))
-    '''
     return display
 
 
