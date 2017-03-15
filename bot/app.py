@@ -94,6 +94,10 @@ class lineServer(object):
             else:
                 display = '我聽不懂你在說什麼，你可以試試：天氣 台北 大安'
             
+            # Especially for Lion
+            if userID == '​U90101030d70543c2eb06911da7c7f93b':
+                display = '獅子主人，底下是您查詢的結果：' + display
+                
             self.line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text=display)
