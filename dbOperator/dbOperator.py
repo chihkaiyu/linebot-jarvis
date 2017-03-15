@@ -2,40 +2,62 @@ import mysql.connector
 
 class DBConnector(object):
     def __init__(self):
-        self.db = (mysql.connector.connect(
-                                user='kai', password='yurabuai99',
-                                database='linebot', host='127.0.0.1'))
-        self.cursor = self.db.cursor()
-        self.insert = """INSERT INTO USER
-                        (userID, favorite, lastCmd)
-                        VALUES (%s, %s, %s)"""
+        self.connection = (mysql.connector.connect(
+                            user='kai', password='yurabuai99',
+                            database='linebot', host='127.0.0.1'))
+        self.cursor = self.connection.cursor()
+        self.insQry = ('INSERT INTO {TABLE}\n'
+                        '({COLUMN})\n'
+                        'VALUES ({VALUE})')
+
+        self.updateQry = ('UPDATE {TABLE}\n'
+                            'SET {COLUMN}\n'
+                            'WHERE {CONDITION}')
         
-        self.update = """UPDATE USER
-                         SET lastCmd=%(lastCmd)s
-                         WHERE userID=%(userID)s"""
+        self.addSingleQuo = lambda val: ('\'{VAL}\''.format(VAL=val) if type(val) is str
+                                                                        else str(val))
 
     def __del__(self):
         self.cursor.close()
-        self.db.close()
+        self.connection.close()
 
-    def isUser(self, userID):
-        pass
+    def isRecord(self, tableName, column, target):
+        checkUser = ('SELECT EXISTS(SELECT * FROM {TABLENAME} WHERE {COLUMN}={TARGET})'
+                    .format(TABLENAME=tableName, 
+                            COLUMN=column, 
+                            TARGET=self.addSingleQuo(target)))
+        self.cursor.execute(checkUser)
+        res = self.cursor.fetchall()
+        return res[0][0]
 
-    def addUser(self, userID):
+
+    def insert(self, tableName, data):
+        query = self.insQry.format(TABLE=tableName,
+                                    COLUMN=', '.join([col for col in data.keys()]),
+                                    VALUE=', '.join([self.addSingleQuo(data[key]) for key in data.keys()]))
         try:
-            self.cursor.execute(self.insert, userID)
-            self.db.commit()
+            self.cursor.execute(query)
+            self.connection.commit()
         except:
-            self.db.rollback()
+            self.connection.rollback()
 
-
-    def setFavorite(self, userID, favorite):
-        pass
-    def updateLastCmd(self, userID, lastCmd):
+    def update(self, tableName, data, condition):
+        query = self.updateQry.format(TABLE=tableName,
+                                        COLUMN=', '.join(['{}={}'.format(key, self.addSingleQuo(data[key])) 
+                                                            for key in data.keys()]),
+                                        CONDITION=condition)
         try:
-            self.cursor.execute(self.update, {'userID': userID, 'lastCmd': lastCmd})
+            self.cursor.execute(query)
+            self.connection.commit()
         except:
-            self.db.rollback()
+            self.connection.rollback()
+    
+    def displayRec(self, tableName):
+        self.cursor.execute('SELECT * FROM {TABLENAME}'.format(TABLENAME=tableName))
+        print(self.cursor.fetchall())
 
     def isTable(self, tableName):
-        pass
+        self.cursor.execute('SHOW TABLES LIKE \'{TABLENAME}\''.format(TABLENAME=tableName))
+        res = self.cursor.fetchall()
+        doesExist = lambda res: True if res else False
+        return doesExist(res)
