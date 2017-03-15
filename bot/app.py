@@ -30,6 +30,9 @@ class lineServer(object):
             sys.exit(1)
         self.line_bot_api = LineBotApi(channel_access_token)
         self.parser = WebhookParser(channel_secret)
+    
+    def __del__(self):
+        print('Destroyed')
 
     def callback(self, environ, start_response):
         # check request path
@@ -56,7 +59,7 @@ class lineServer(object):
         except InvalidSignatureError:
             start_response('400 Bad Request', [])
             return self.create_body('Bad Request')
-
+        
         # database connect
         db = dbOperator.DBConnector()
         tableName = 'USER'
@@ -66,7 +69,7 @@ class lineServer(object):
         if not db.isRecord('USER', 'userID', userID):
             data = {'userID': userID}
             db.insert('USER', data)
-        
+
         # if event is MessageEvent and message is TextMessage, then echo text
         for event in events:
             if not isinstance(event, MessageEvent):
@@ -75,8 +78,10 @@ class lineServer(object):
                 continue
 
             command = event.message.text.split()
-            data = {'lastCmd': command}
-            db.update(tableName, data, 'userID={}'.format(userID))
+            
+            data = {'lastCmd': event.message.text}
+            db.update(tableName, data, 'userID=\'{}\''.format(userID))
+            
             if command[0] == '天氣':
                 if len(command) < 3:
                     command.append(command[-1])

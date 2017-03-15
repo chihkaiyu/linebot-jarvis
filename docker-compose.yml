@@ -18,5 +18,7 @@ services:
         ports:
             - "443:443"
         restart: always
+        depends_on:
+            - mysqlbot
         links:
             - "mysqlbot:db"

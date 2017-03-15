@@ -14,6 +14,8 @@ class DBConnector(object):
         self.updateQry = ('UPDATE {TABLE}\n'
                             'SET {COLUMN}\n'
                             'WHERE {CONDITION}')
+        self.createTbl = ('CREATE TABLE {TABLE} (\n'
+                            '{SCHEMA})')
         
         self.addSingleQuo = lambda val: ('\'{VAL}\''.format(VAL=val) if type(val) is str
                                                                         else str(val))
@@ -42,9 +44,19 @@ class DBConnector(object):
         except:
             self.connection.rollback()
 
+    def create(self, tableName, schema):
+        query = self.createTbl.format(TABLE=tableName, 
+                                        SCHEMA=', \n'.join(['{NAME} {TYPE}' \
+                                                .format(NAME=key, TYPE=schema[key]) for key in schema.keys()]))
+        try:
+            self.cursor.execute(query)
+            self.connection.commit()
+        except:
+            self.connection.rollback()
+
     def update(self, tableName, data, condition):
         query = self.updateQry.format(TABLE=tableName,
-                                        COLUMN=', '.join(['{}={}'.format(key, self.addSingleQuo(data[key])) 
+                                        COLUMN=', '.join(['{}={}'.format(key, self.addSingleQuo(data[key]))
                                                             for key in data.keys()]),
                                         CONDITION=condition)
         try:
