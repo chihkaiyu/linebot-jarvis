@@ -102,9 +102,6 @@ class lineServer(object):
                 event.reply_token,
                 TextSendMessage(text=display)
             )
-        #==============================#
-        db.displayRec(tableName)
-        #==============================#
 
         start_response('200 OK', [])
         return self.create_body('OK')
