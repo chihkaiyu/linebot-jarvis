@@ -3,12 +3,12 @@ rm:
 run:
 	docker-compose up -d
 in:
-	docker exec -ti lienbotjarvis_bot_1 /bin/bash
+	docker exec -ti linebotjarvis_bot_1 /bin/bash
 build:
-	docker build -t linebot_bot .
+	docker build -t linebot ./bot
 upgrade:
 	make rm
-	docker rmi linebot_bot
+	docker rmi linebot
 	make build
 	make run
 logs:
