@@ -96,9 +96,9 @@ class lineServer(object):
             
             # Especially for Lion
             if userID == '​U90101030d70543c2eb06911da7c7f93b':
-                display = '獅子主人，底下是您查詢的結果：' + display
+                display = '獅子主人，底下是您查詢的結果：\n' + display
             elif userID == 'Uf172444fa0ec73d6f4e2b2aa287c2832':
-                display = '主人，您要的答案：' + display
+                display = '主人，您要的答案：\n' + display
                 
             self.line_bot_api.reply_message(
                 event.reply_token,
