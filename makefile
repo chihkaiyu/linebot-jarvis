@@ -8,7 +8,6 @@ build:
 	docker build -t linebot ./bot
 upgrade:
 	make rm
-	docker rmi linebot
 	make build
 	make run
 logs:
