@@ -43,7 +43,7 @@ class DBConnector(object):
     
     def query(self, tableName, column, condition):
         mysqlQuery = self.mysqlSelect.format(COLUMN=column, \
-                                            TALBE=tableName, \
+                                            TABLE=tableName, \
                                             CONDITION=condition)
         self.cursor.execute(mysqlQuery)
         return self.cursor.fetchall()[0][0]
