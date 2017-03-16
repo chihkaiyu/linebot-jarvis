@@ -7,16 +7,16 @@ class DBConnector(object):
                             database='linebot', host='db'))
         
         self.cursor = self.connection.cursor()
-        self.insQry = ('INSERT INTO {TABLE}\n'
+        self.mysqlInsert = ('INSERT INTO {TABLE}\n'
                         '({COLUMN})\n'
                         'VALUES ({VALUE})')
 
-        self.updateQry = ('UPDATE {TABLE}\n'
+        self.mysqlUpdate = ('UPDATE {TABLE}\n'
                             'SET {COLUMN}\n'
                             'WHERE {CONDITION}')
-        self.createTbl = ('CREATE TABLE {TABLE} (\n'
+        self.mysqlCreate = ('CREATE TABLE {TABLE} (\n'
                             '{SCHEMA})')
-        self.query = ('SELECT {COLUMN}\n'
+        self.mysqlSelect = ('SELECT {COLUMN}\n'
                             'FROM {TABLE}\n'
                             'WHERE {CONDITION}')
         
@@ -42,14 +42,14 @@ class DBConnector(object):
         return doesExist(res)
     
     def query(self, tablename, column, condition):
-        mysqlQuery = self.queryData.format(COLUMN=column, \
+        mysqlQuery = self.mysqlSelect.format(COLUMN=column, \
                                             TALBE=talbeName, \
                                             CONDITION=condition)
         self.cursor.execute(mysqlQuery)
         return self.cursor.fetchall()[0][0]
 
     def insert(self, tableName, data):
-        mysqlQuery = self.insQry.format(TABLE=tableName, \
+        mysqlQuery = self.mysqlInsert.format(TABLE=tableName, \
                                         COLUMN=', '.join([col for col in data.keys()]), \
                                         VALUE=', '.join([self.addSingleQuo(data[key]) for key in data.keys()]))
         try:
@@ -59,7 +59,7 @@ class DBConnector(object):
             self.connection.rollback()
 
     def create(self, tableName, schema):
-        mysqlQuery = self.createTbl.format(TABLE=tableName, \
+        mysqlQuery = self.mysqlCreate.format(TABLE=tableName, \
                                             SCHEMA=', \n'.join(['{NAME} {TYPE}' \
                                                                 .format(NAME=key, TYPE=schema[key]) for key in schema.keys()]))
         try:
@@ -69,7 +69,7 @@ class DBConnector(object):
             self.connection.rollback()
 
     def update(self, tableName, data, condition):
-        mysqlQuery = self.updateQry.format(TABLE=tableName, \
+        mysqlQuery = self.mysqlUpdate.format(TABLE=tableName, \
                                             COLUMN=', '.join(['{}={}'.format(key, self.addSingleQuo(data[key])) \
                                                                 for key in data.keys()]), \
                                             CONDITION=condition)

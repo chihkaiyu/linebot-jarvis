@@ -84,8 +84,8 @@ class lineServer(object):
             
             if command[0] == '天氣':
                 if len(command) == 1:
-                    fav = db.query(tableName, 'lastCmd', 'userID=\'{}\''.format(userID))
-                    command += [fav]
+                    fav = db.query(tableName, 'favorite', 'userID=\'{}\''.format(userID))
+                    command += fav.split()
                 elif len(command) == 2:
                     command.append(command[-1])
                 display = weather.getWeather(command[1:])
