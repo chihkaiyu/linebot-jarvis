@@ -42,8 +42,8 @@ class DBConnector(object):
         return doesExist(res)
     
     def query(self, tablename, column, condition):
-        mysqlQuery = self.queryData.format(COLUMN=column \
-                                            TALBE=talbeName \
+        mysqlQuery = self.queryData.format(COLUMN=column, \
+                                            TALBE=talbeName, \
                                             CONDITION=condition)
         self.cursor.execute(mysqlQuery)
         return self.cursor.fetchall()[0][0]
@@ -71,7 +71,7 @@ class DBConnector(object):
     def update(self, tableName, data, condition):
         mysqlQuery = self.updateQry.format(TABLE=tableName, \
                                             COLUMN=', '.join(['{}={}'.format(key, self.addSingleQuo(data[key])) \
-                                                                for key in data.keys()]),\
+                                                                for key in data.keys()]), \
                                             CONDITION=condition)
         try:
             self.cursor.execute(mysqlQuery)
