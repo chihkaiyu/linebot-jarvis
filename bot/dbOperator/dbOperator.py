@@ -41,9 +41,9 @@ class DBConnector(object):
         doesExist = lambda res: True if res else False
         return doesExist(res)
     
-    def query(self, tablename, column, condition):
+    def query(self, tableName, column, condition):
         mysqlQuery = self.mysqlSelect.format(COLUMN=column, \
-                                            TALBE=talbeName, \
+                                            TALBE=tableName, \
                                             CONDITION=condition)
         self.cursor.execute(mysqlQuery)
         return self.cursor.fetchall()[0][0]
