@@ -1,10 +1,6 @@
 FROM nginx:1.11.9
 MAINTAINER Kai Yu rebellionyu@gmail.com
 
-ENV CHANNEL_ACCESS_TOKEN S/4X9lo2HMDHCXo+S3PHrihkrJaFNPrRfKyNXPoliEPXX4Tt80aaoALWYeHc25f/sDbvE9McXcv7cHeF0PDmAu2gSegfx1L6dyjeZQ596YlRFBLAcfyQC+dGMNlSAud29Rpe6rlrjCR/lEdDo3DnggdB04t89/1O/w1cDnyilFU=
-
-ENV CHANNEL_SECRET 3a2311af95ef08db962704516fc4c3fd
-
 RUN apt-get update && apt-get install -y python3 supervisor python3-pip
 COPY conf/requirements.txt /opt/linebot/requirements.txt
 COPY conf/default.conf /etc/nginx/conf.d/default.conf
