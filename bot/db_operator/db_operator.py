@@ -2,6 +2,7 @@
 """This is a module to deal with MySQL database"""
 
 import json
+import os
 import mysql.connector
 
 
@@ -9,7 +10,9 @@ class DBConnector(object):
     """A MySQL database connector"""
 
     def __init__(self):
-        mysql_login_info = json.load(open('../credential/mysql_config.json'))
+        config_path = os.path.join(os.pardir, 'credential',
+                                   'mysql_config.json')
+        mysql_login_info = json.load(open(config_path))
         self.connection = (mysql.connector.connect(**mysql_login_info))
 
         self.cursor = self.connection.cursor()
