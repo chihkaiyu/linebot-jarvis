@@ -10,8 +10,8 @@ class DBConnector(object):
     """A MySQL database connector"""
 
     def __init__(self):
-        config_path = os.path.join(os.pardir, 'credential',
-                                   'mysql_config.json')
+        config_path = os.path.join(os.path.abspath(os.pardir),
+                                   'credential', 'mysql_config.json')
         mysql_login_info = json.load(open(config_path))
         self.connection = (mysql.connector.connect(**mysql_login_info))
 
@@ -111,5 +111,3 @@ class DBConnector(object):
         """Display a record in database"""
         self.cursor.execute('SELECT * FROM {TABLE}'.format(TABLE=table_name))
         print(self.cursor.fetchall())
-
-
