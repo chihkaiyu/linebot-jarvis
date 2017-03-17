@@ -21,6 +21,9 @@ COPY db_operator /opt/linebot/db_operator
 RUN mkdir /opt/html
 COPY index.html /opt/html/index.html
 
+# credential
+COPY credential /opt/linebot/credential
+
 # ssl
 COPY ssl/bundle.crt /etc/ssl/bundle.crt
 COPY ssl/linebot.kaiyu.site.key /etc/ssl/linebot.kaiyu.site.key
