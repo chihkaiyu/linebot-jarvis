@@ -11,7 +11,7 @@ RUN pip3 install -r /opt/linebot/requirements.txt
 COPY app.py /opt/linebot/app.py
 COPY weatherParser /opt/linebot/weatherParser
 COPY metroParser /opt/linebot/metroParser
-COPY dbOperator /opt/linebot/dbOperator
+COPY db_operator /opt/linebot/db_operator
 
 # write log into file
 #RUN unlink /var/log/nginx/access.log
