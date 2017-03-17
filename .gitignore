@@ -1,6 +1,7 @@
 # Custom
 mysqlbot_data/
 .DS_Store
+ssl/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
