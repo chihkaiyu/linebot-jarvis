@@ -13,3 +13,6 @@ upgrade:
 	make run
 logs:
 	docker logs linebotjarvis_bot_1
+push:
+	git push origin master
+	git push origin develop
