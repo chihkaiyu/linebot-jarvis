@@ -10,8 +10,8 @@ class DBConnector(object):
     """A MySQL database connector"""
 
     def __init__(self):
-        config_path = os.path.join(os.path.abspath(os.pardir),
-                                   'credential', 'mysql_config.json')
+        root_dir = os.environ.get('ROOT_DIR')
+        config_path = os.path.join(root_dir, 'credential', 'mysql_config.json')
         mysql_login_info = json.load(open(config_path))
         self.connection = (mysql.connector.connect(**mysql_login_info))
 
