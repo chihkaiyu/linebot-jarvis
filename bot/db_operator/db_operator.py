@@ -9,10 +9,8 @@ import mysql.connector
 class DBConnector(object):
     """A MySQL database connector"""
 
-    def __init__(self):
-        root_dir = os.environ.get('ROOT_DIR')
-        config_path = os.path.join(root_dir, 'credential', 'mysql_config.json')
-        mysql_login_info = json.load(open(config_path))
+    def __init__(self, mysql_login_info):
+
         self.connection = (mysql.connector.connect(**mysql_login_info))
 
         self.cursor = self.connection.cursor()
@@ -38,6 +36,17 @@ class DBConnector(object):
         self.cursor.close()
         self.connection.close()
 
+    def db_init(self):
+        """Create talbe if database is not intialized"""
+
+        table_schema = {'userID': 'VARCHAR(64) NOT NULL',
+                        'favorite': 'VARCHAR(64)',
+                        'lastCmd': 'VARCHAR(64)',
+                        'PRIMARY KEY': '(userID)'}
+        table_name = 'USER'
+        if not self.is_table(table_name):
+            self.create(table_name, table_schema)
+
     def is_record(self, table_name, column, target):
         """Return whether a record exists in table"""
         mysql_query = ('SELECT EXISTS ( \n'
@@ -55,8 +64,9 @@ class DBConnector(object):
         self.cursor.execute('SHOW TABLES LIKE \'{TABLE}\''
                             .format(TABLE=table_name))
         res = self.cursor.fetchall()
-        # does_exist = lambda res: True if res else False
-        return res
+
+        def does_exist(res): return True if res else False
+        return does_exist(res)
 
     def query(self, table_name, column, condition):
         """Query database"""
@@ -101,6 +111,16 @@ class DBConnector(object):
                        .format(TABLE=table_name,
                                COLUMN=', '.join(data_format),
                                CONDITION=condition))
+        try:
+            self.cursor.execute(mysql_query)
+            self.connection.commit()
+        except:
+            self.connection.rollback()
+
+    def drop(self, table_name):
+        """Drop a talbe"""
+
+        mysql_query = ('DROP TABLE {}'.format(table_name))
         try:
             self.cursor.execute(mysql_query)
             self.connection.commit()
