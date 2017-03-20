@@ -26,7 +26,7 @@ class LineServer(object):
 
     def __init__(self):
         line_config = ConfigParser()
-        line_config_path = os.path.join(os.path.abspath(__file__),
+        line_config_path = os.path.join(os.getcwd(),
                                         'credential', 'line_config.ini')
         line_config.read(line_config_path)
         if not line_config.has_option('Line Config', 'ACCESS_TOKEN'):
