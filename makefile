@@ -14,5 +14,7 @@ upgrade:
 logs:
 	docker logs linebotjarvis_bot_1
 push:
+	git co master
 	git push origin master
+	git co develop
 	git push origin develop
