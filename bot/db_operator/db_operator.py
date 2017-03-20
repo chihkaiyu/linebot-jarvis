@@ -61,7 +61,7 @@ class DBConnector(object):
     def query(self, table_name, column, condition):
         """Query database"""
         mysql_query = self.mysql_select.format(COLUMN=column,
-                                               TALBE=table_name,
+                                               TABLE=table_name,
                                                CONDITION=condition)
         self.cursor.execute(mysql_query)
         return self.cursor.fetchall()[0][0]
