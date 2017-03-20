@@ -79,7 +79,7 @@ class LineServer(object):
 
         # create user if not in database
         if not db.is_record(table_name, 'userID', user_id):
-            data = {'user_ID': user_id}
+            data = {'userID': user_id}
             db.insert(table_name, data)
 
         # if event is MessageEvent and message is TextMessage, then echo text
@@ -92,11 +92,11 @@ class LineServer(object):
             command = event.message.text.split()
 
             data = {'lastCmd': event.message.text}
-            db.update(table_name, data, 'user_ID=\'{}\''.format(user_id))
+            db.update(table_name, data, 'userID=\'{}\''.format(user_id))
 
             if command[0] == '天氣':
                 if len(command) == 1:
-                    fav = db.query(table_name, 'favorite', 'user_ID=\'{}\''
+                    fav = db.query(table_name, 'favorite', 'userID=\'{}\''
                                    .format(user_id))
                     command += fav.split()
                 elif len(command) == 2:
@@ -109,7 +109,7 @@ class LineServer(object):
                     display = metro.getDuration(command[1:])
             elif command[0] == '設定':
                 data = {'favorite': ' '.join(command[1:])}
-                db.update(table_name, data, 'user_ID=\'{}\''.format(user_id))
+                db.update(table_name, data, 'userID=\'{}\''.format(user_id))
                 display = '已經您的常用地點設為：{}'.format(' '.join(command[1:]))
             else:
                 display = '我聽不懂你在說什麼，你可以試試：天氣 台北 大安'
