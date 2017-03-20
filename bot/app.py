@@ -3,10 +3,11 @@
 
 import sys
 import os
+from configparser import ConfigParser
 from weatherParser import weather
 from metroParser import metro
 from db_operator import db_operator
-from configparser import ConfigParser
+
 
 from linebot import (
     LineBotApi, WebhookParser
@@ -25,7 +26,9 @@ class LineServer(object):
 
     def __init__(self):
         line_config = ConfigParser()
-        line_config.read('./credential/line_config.ini')
+        line_config_path = os.path.join(os.path.abspath(__file__),
+                                        'credential', 'line_config.ini')
+        line_config.read(line_config_path)
         if not line_config.has_option('Line Config', 'ACCESS_TOKEN'):
             print('Specify LINE_CHANNEL_SECRET as environment variable.')
             sys.exit(1)
