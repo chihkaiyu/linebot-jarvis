@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""This is a module to get weather condition"""
+
 from urllib.request import urlopen
 import os
 import json
@@ -12,20 +14,20 @@ class WeatherParser(object):
     """A class get weather condition, and parse data"""
 
     def __init__(self, query):
-
         # Preprocess
         query[0] = query[0].replace('台', '臺')
         query[1] = query[1].replace('台', '臺')
 
         # Get county code
-        folder_name = os.path.dirname(os.path.abspath(__file__))
-        code_file = json.load(open(os.path.join(folder_name, 'distInfo.json'),
-                                   'r', encoding='utf8'))
+        root_dir = os.environ.get('ROOT_DIR')
+        code_file_path = os.path.join(root_dir, 'weather_parser',
+                                      'dist_info.json')
+        code_file = json.load(open(code_file_path, 'r', encoding='utf8'))
 
         # Approximate matching
         query[0] = process.extractOne(query[0], code_file.keys())[0]
         query[1] = process.extractOne(query[1], code_file[query[0]].keys())[0]
-        self.county_code = code_file[query[0]][query[1]][0]
+        self.county_code = code_file[query[0]][query[1]]['code']
 
         # Attribute
         self.three_hour_website = ('http://www.cwb.gov.tw/V7/forecast/town368'
@@ -36,6 +38,7 @@ class WeatherParser(object):
                                   .format(county_code=self.county_code))
         self.air_website = ('http://taqm.epa.gov.tw/taqm/aqs.ashx?'
                             'lang=tw&act=aqi-epa')
+        self.station_id = int(code_file[query[0]][query[1]]['station_id'])
 
     def request_weahter(self, url):
         """Send request to website"""
@@ -57,7 +60,6 @@ class WeatherParser(object):
         parsed['date'] = filtered[0].find_all('td')[1:]
         parsed['col'] = [self.get_colspan(col.get('colspan'))
                          for col in parsed['date']]
-        #tmp_range = sum(parsed['col'])
         parsed['time'] = filtered[1].find_all('td')[1:]
         parsed['temp'] = filtered[3].find_all('td')[1:]
 
@@ -125,6 +127,31 @@ class WeatherParser(object):
             start += parsed['col'][day_idx]
         return res
 
+    def air_quality(self, raw_data):
+        """Get air quality, return formatted string"""
+        aqi_data = json.loads(raw_data.read().decode('utf8')['Data'])
+        res = {'aqiStyle': aqi_data[self.station_id]['AQIStyle'],
+               'site': aqi_data[self.station_id]['SiteName']}
+        if res['aqiStyle'] == 'AQI0':
+            res['aqiStyle'] = '設備維護'
+        elif res['aqiStyle'] == 'AQI1':
+            res['aqiStyle'] = '良好'
+        elif res['aqiStyle'] == 'AQI2':
+            res['aqiStyle'] = '普通'
+        elif res['aqiStyle'] == 'AQI3':
+            res['aqiStyle'] = '對敏感族群不健康'
+        elif res['aqiStyle'] == 'AQI4':
+            res['aqiStyle'] = '對所有族群不健康'
+        elif res['aqiStyle'] == 'AQI5':
+            res['aqiStyle'] = '非常不健康'
+        elif res['aqiStyle'] == 'AQI6':
+            res['aqiStyle'] = '危害'
+        display = ('空氣品質: \n'
+                   '    觀測站: {site}\n'
+                   '    空氣品質指標: {quality}\n'
+                   .format(site=res[-1]['site'], quality=res[-1]['aqiStyle']))
+        return display
+
     def typesetting(self, res, title=''):
         """Combine the result in displaying format"""
 
@@ -160,6 +187,10 @@ if __name__ == '__main__':
     seven_day_collect = W.collect_data(seven_day_parsed_data)
     seven_day_display = W.typesetting(seven_day_collect[1:])
     #pprint.pprint(three_hour_collect)
+
+    air_raw_data = W.request_weahter(W.air_website)
+    air_data = W.air_quality(air_raw_data)
+    print(air_data)
     print(three_hour_display)
     print(seven_day_display)
 

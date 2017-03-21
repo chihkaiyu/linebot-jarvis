@@ -9,8 +9,8 @@ RUN pip3 install -r /opt/linebot/requirements.txt
 
 # bot module
 COPY app.py /opt/linebot/app.py
-COPY weatherParser /opt/linebot/weatherParser
-COPY metroParser /opt/linebot/metroParser
+COPY weatherParser /opt/linebot/weather_parser
+COPY metroParser /opt/linebot/metro_parser
 COPY db_operator /opt/linebot/db_operator
 ENV ROOT_DIR /opt/linebot
 
