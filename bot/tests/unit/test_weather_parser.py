@@ -1,18 +1,41 @@
 import unittest
+import os
+import json
 
-from weather_parser.weather import WeatherParser
+from bot.weather_parser.weather import WeatherParser
+
 
 class WeatherParserTest(unittest.TestCase):
     """Test weather_parser"""
 
     def setUp(self):
         self.wea = WeatherParser(['台北', '大安'])
-        with open('website_test_data/three_hours_1.htm',
+
+        # Load test data
+        root_dir = os.path.dirname(os.path.abspath(__file__))
+        test_data_file = os.listdir(os.path.join(root_dir, 'test_data'))
+        self.test_data = []
+        for file_name in test_data_file:
+            with open(os.path.join(root_dir, 'test_data', file_name),
+                      'r', encoding='utf8') as fp:
+                self.test_data.append(fp.read())
+
+        # Load ground truth
+        ground_truth_file = os.listdir(os.path.join(root_dir, 'ground_truth'))
+        self.ground_truth = []
+        for file_name in ground_truth_file:
+            with open(os.path.join(root_dir, 'ground_truth', file_name),
+                      'r', encoding='utf8') as fp:
+                self.ground_truth.append(json.load(fp))
+
+        '''
+        with open('test_data/three_hours_1.htm',
                   'r', encoding='utf8') as fp:
             self.three_hours_raw_data = fp.read()
-        with open('website_test_data/seven_days_1.htm',
+        with open('test_data/seven_days_1.htm',
                   'r', encoding='utf8') as fp:
             self.seven_days_raw_data = fp.read()
+        '''
 
     def tearDown(self):
         self.wea = None
@@ -92,14 +115,6 @@ class WeatherParserTest(unittest.TestCase):
         ))
         self.assertEqual(len(seven_days_collect_data), 7)
 
-    '''
-    def test_air_quality(self):
-        pass
-
-    def test_typesetting(self):
-        pass
-    '''
-
     def test_get_colspan(self):
         """Test get_colspan function"""
 
@@ -107,7 +122,3 @@ class WeatherParserTest(unittest.TestCase):
         self.assertEqual(self.wea.get_colspan('10'), 10)
         self.assertEqual(self.wea.get_colspan(None), 1)
         self.assertEqual(self.wea.get_colspan(''), 1)
-
-
-if __name__ == '__main__':
-    unittest.main()
