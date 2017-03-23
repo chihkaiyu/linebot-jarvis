@@ -9,10 +9,12 @@ import mysql.connector
 class DBConnector(object):
     """A MySQL database connector"""
 
-    def __init__(self):
-        root_dir = os.environ.get('ROOT_DIR')
-        config_path = os.path.join(root_dir, 'credential', 'mysql_config.json')
-        mysql_login_info = json.load(open(config_path))
+    def __init__(self, mysql_login_info=None):
+        if not mysql_login_info:
+            folder_name = os.path.abspath(os.pardir)
+            config_path = os.path.join(folder_name, 'credential',
+                                       'mysql_config.json')
+            mysql_login_info = json.load(open(config_path))
         self.connection = (mysql.connector.connect(**mysql_login_info))
 
         self.cursor = self.connection.cursor()
@@ -40,6 +42,7 @@ class DBConnector(object):
 
     def is_record(self, table_name, column, target):
         """Return whether a record exists in table"""
+
         mysql_query = ('SELECT EXISTS ( \n'
                        'SELECT * FROM {TABLE} \n'
                        'WHERE {COLUMN}={TARGET})'
@@ -52,6 +55,7 @@ class DBConnector(object):
 
     def is_table(self, table_name):
         """Return wheter a table exists"""
+
         self.cursor.execute('SHOW TABLES LIKE \'{TABLE}\''
                             .format(TABLE=table_name))
         res = self.cursor.fetchall()
@@ -60,6 +64,7 @@ class DBConnector(object):
 
     def query(self, table_name, column, condition):
         """Query database"""
+
         mysql_query = self.mysql_select.format(COLUMN=column,
                                                TABLE=table_name,
                                                CONDITION=condition)
@@ -68,6 +73,7 @@ class DBConnector(object):
 
     def insert(self, table_name, data):
         """Insert a record to database"""
+
         mysql_query = (self.mysql_insert
                        .format(TABLE=table_name,
                                COLUMN=', '.join([col for col in data.keys()]),
@@ -81,6 +87,7 @@ class DBConnector(object):
 
     def create(self, table_name, schema):
         """Create a table in database"""
+
         schema_format = ['{NAME} {TYPE}'.format(NAME=key, TYPE=schema[key])
                          for key in schema.keys()]
         mysql_query = (self.mysql_create
@@ -94,6 +101,7 @@ class DBConnector(object):
 
     def update(self, table_name, data, condition):
         """Update a record in database"""
+
         data_format = ['{KEY}={VALUE}'
                        .format(KEY=key, VALUE=self.add_single_quo(data[key]))
                        for key in data.keys()]
@@ -107,7 +115,18 @@ class DBConnector(object):
         except:
             self.connection.rollback()
 
+    def table_init(self, table_name):
+        """Initialize a table if not exists"""
+
+        table_schema = {'userID': 'VARCHAR(64) NOT NULL',
+                        'favorite': 'VARCHAR(64)',
+                        'lastCmd': 'VARCHAR(64)',
+                        'PRIMARY KEY': '(userID)'}
+        if not self.is_table(table_name):
+            self.create(table_name, table_schema)
+
     def display_rec(self, table_name):
         """Display a record in database"""
+
         self.cursor.execute('SELECT * FROM {TABLE}'.format(TABLE=table_name))
         print(self.cursor.fetchall())
