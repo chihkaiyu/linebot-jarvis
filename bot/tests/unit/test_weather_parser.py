@@ -1,6 +1,7 @@
 import unittest
 import os
 import json
+from bs4 import BeautifulSoup
 
 from bot.weather_parser.weather import WeatherParser
 
@@ -14,28 +15,25 @@ class WeatherParserTest(unittest.TestCase):
         # Load test data
         root_dir = os.path.dirname(os.path.abspath(__file__))
         test_data_file = os.listdir(os.path.join(root_dir, 'test_data'))
-        self.test_data = []
+        self.test_three_hours_data = []
+        self.test_seven_days_data = []
         for file_name in test_data_file:
             with open(os.path.join(root_dir, 'test_data', file_name),
                       'r', encoding='utf8') as fp:
-                self.test_data.append(fp.read())
+                if file_name == 'three_hours.json':
+                    self.test_three_hours_data.append(json.load(fp))
+                elif file_name == 'seven_days.json':
+                    self.test_seven_days_data.append(json.load(fp))
 
-        # Load ground truth
-        ground_truth_file = os.listdir(os.path.join(root_dir, 'ground_truth'))
-        self.ground_truth = []
-        for file_name in ground_truth_file:
-            with open(os.path.join(root_dir, 'ground_truth', file_name),
-                      'r', encoding='utf8') as fp:
-                self.ground_truth.append(json.load(fp))
-
-        '''
-        with open('test_data/three_hours_1.htm',
-                  'r', encoding='utf8') as fp:
-            self.three_hours_raw_data = fp.read()
-        with open('test_data/seven_days_1.htm',
-                  'r', encoding='utf8') as fp:
-            self.seven_days_raw_data = fp.read()
-        '''
+        # Convert every parsed_data to beautifulsoup format
+        for test_data in self.test_three_hours_data:
+            test_data['parsed_data'] = self.string_to_bs_format(
+                test_data['parsed_data']
+            )
+        for test_data in self.test_seven_days_data:
+            test_data['parsed_data'] = self.string_to_bs_format(
+                test_data['parsed_data']
+            )
 
     def tearDown(self):
         self.wea = None
@@ -72,48 +70,46 @@ class WeatherParserTest(unittest.TestCase):
     def test_parse_three_hours_data(self):
         """Test three hours data parse function"""
 
-        three_hours_parsed_data = (self.wea.parse_three_hours_data(
-            self.three_hours_raw_data
-        ))
-        self.assertEqual(sum(three_hours_parsed_data['col']), 17)
-        self.assertEqual(len(three_hours_parsed_data['date']), 3)
-        self.assertEqual(len(three_hours_parsed_data['time']), 17)
-        self.assertEqual(len(three_hours_parsed_data['temp']), 17)
-        self.assertEqual(len(three_hours_parsed_data['cond']), 17)
+        for test_data in self.test_three_hours_data:
+            three_hours_parsed_data = (self.wea.parse_three_hours_data(
+                test_data['raw_data']
+            ))
+            self.assertDictEqual(three_hours_parsed_data,
+                                 test_data['parsed_data'])
 
     def test_parse_seven_days_data(self):
         """Test seven days data parse function"""
 
-        seven_days_parsed_data = (self.wea.parse_seven_days_data(
-            self.seven_days_raw_data
-        ))
-        self.assertEqual(sum(seven_days_parsed_data['col']), 14)
-        self.assertEqual(len(seven_days_parsed_data['date']), 7)
-        self.assertEqual(len(seven_days_parsed_data['time']), 14)
-        self.assertEqual(len(seven_days_parsed_data['temp']), 14)
-        self.assertEqual(len(seven_days_parsed_data['cond']), 14)
+        for test_data in self.test_seven_days_data:
+            seven_days_parsed_data = (self.wea.parse_seven_days_data(
+                test_data['raw_data']
+            ))
+            self.assertDictEqual(seven_days_parsed_data,
+                                 test_data['parsed_data'])
 
     def test_three_hours_collect_data(self):
         """Test three hours collect data function"""
 
-        three_hours_parsed_data = (self.wea.parse_three_hours_data(
-            self.three_hours_raw_data
-        ))
-        three_hours_collect_data = (self.wea.collect_data(
-            three_hours_parsed_data
-        ))
-        self.assertEqual(len(three_hours_collect_data), 3)
+        for test_data in self.test_three_hours_data:
+            three_hours_collect_data = (self.wea.collect_data(
+                test_data['parsed_data']
+            ))
+
+            # Assertion of every day of collect data
+            for day, ground in zip(three_hours_collect_data,
+                                   test_data['collect_data']):
+                self.assertDictEqual(day, ground)
 
     def test_seven_days_collect_data(self):
         """Test seven days collect data function"""
 
-        seven_days_parsed_data = (self.wea.parse_seven_days_data(
-            self.seven_days_raw_data
-        ))
-        seven_days_collect_data = (self.wea.collect_data(
-            seven_days_parsed_data
-        ))
-        self.assertEqual(len(seven_days_collect_data), 7)
+        for test_data in self.test_seven_days_data:
+            seven_days_collect_data = (self.wea.collect_data(
+                test_data['parsed_data']
+            ))
+            for day, ground in zip(seven_days_collect_data,
+                                   test_data['collect_data']):
+                self.assertDictEqual(day, ground)
 
     def test_get_colspan(self):
         """Test get_colspan function"""
@@ -122,3 +118,12 @@ class WeatherParserTest(unittest.TestCase):
         self.assertEqual(self.wea.get_colspan('10'), 10)
         self.assertEqual(self.wea.get_colspan(None), 1)
         self.assertEqual(self.wea.get_colspan(''), 1)
+
+    def string_to_bs_format(self, parsed_data):
+        """Convert BeautifulSoup format to string"""
+
+        for key in parsed_data.keys():
+            if key != 'col':
+                parsed_data[key] = [BeautifulSoup(tag, 'html.parser').find()
+                                    for tag in parsed_data[key]]
+        return parsed_data
