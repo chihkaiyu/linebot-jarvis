@@ -19,14 +19,15 @@ class WeatherParser(object):
         query[1] = query[1].replace('台', '臺')
 
         # Get county code
-        root_dir = os.environ.get('ROOT_DIR')
-        code_file_path = os.path.join(root_dir, 'weather_parser',
-                                      'dist_info.json')
+        # root_dir = os.environ.get('ROOT_DIR')
+        folder_name = os.path.dirname(os.path.abspath(__file__))
+        code_file_path = os.path.join(folder_name, 'dist_info.json')
         code_file = json.load(open(code_file_path, 'r', encoding='utf8'))
 
         # Approximate matching
         query[0] = process.extractOne(query[0], code_file.keys())[0]
         query[1] = process.extractOne(query[1], code_file[query[0]].keys())[0]
+        self.query = query
         self.county_code = code_file[query[0]][query[1]]['code']
 
         # Attribute
@@ -40,7 +41,7 @@ class WeatherParser(object):
                             'lang=tw&act=aqi-epa')
         self.station_id = int(code_file[query[0]][query[1]]['station_id'])
 
-    def request_weahter(self, url):
+    def request_weather(self, url):
         """Send request to website"""
 
         raw_data = urlopen(url)
@@ -84,14 +85,6 @@ class WeatherParser(object):
         # date: 0, time: 1, high temp: 3, low temp: 4, condition: 2
         parsed = {}
         parsed['date'] = filtered[0].find_all('td')[1:]
-        '''
-        if first_day == parsed['date'][0].get_text()[-1]:
-            parsed['date'] = parsed['date'][2:]
-            start = 5
-        else:
-            parsed['date'] = parsed['date'][1:6]
-            start = 3
-        '''
         parsed['col'] = [2]*7
         parsed['time'] = filtered[1].find_all('td')[1:]
 
@@ -99,7 +92,9 @@ class WeatherParser(object):
         parsed['temp'] = filtered[4].find_all('td')[1:]
         for low, high in zip(parsed['temp'],
                              filtered[3].find_all('td')[1:]):
-            low.append('~{}'.format(high.get_text()))
+            low.string = '{LOW}~{HIGH}'.format(LOW=low.get_text(),
+                                               HIGH=high.get_text())
+            # low.append('~{}'.format(high.get_text()))
 
         # Insert condition title to tag
         parsed['cond'] = filtered[2].find_all('img')
@@ -108,14 +103,14 @@ class WeatherParser(object):
         return parsed
 
     def collect_data(self, parsed):
-        """Collect the data"""
+        """Put the data of a day into dictionary"""
 
         res = []
         start = 0
-        for day_idx in range(len(parsed['date'])):
-            end = start + parsed['col'][day_idx]
-            tmp_date = parsed['date'][day_idx].get_text()
-            res.append({'col': parsed['col'][day_idx],
+        for day, col in zip(parsed['date'], parsed['col']):
+            end = start + col
+            tmp_date = day.get_text()
+            res.append({'col': col,
                         'date': '{WEEK} {DATE}'
                                 .format(WEEK=tmp_date[:5], DATE=tmp_date[5:]),
                         'time': [time.get_text()
@@ -124,12 +119,12 @@ class WeatherParser(object):
                                  for temp in parsed['temp'][start:end]],
                         'cond': [cond.get_text()
                                  for cond in parsed['cond'][start:end]]})
-            start += parsed['col'][day_idx]
+            start += col
         return res
 
     def air_quality(self, raw_data):
         """Get air quality, return formatted string"""
-        aqi_data = json.loads(raw_data.read().decode('utf8')['Data'])
+        aqi_data = json.loads(raw_data.read().decode('utf8'))['Data']
         res = {'aqiStyle': aqi_data[self.station_id]['AQIStyle'],
                'site': aqi_data[self.station_id]['SiteName']}
         if res['aqiStyle'] == 'AQI0':
@@ -149,7 +144,7 @@ class WeatherParser(object):
         display = ('空氣品質: \n'
                    '    觀測站: {site}\n'
                    '    空氣品質指標: {quality}\n'
-                   .format(site=res[-1]['site'], quality=res[-1]['aqiStyle']))
+                   .format(site=res['site'], quality=res['aqiStyle']))
         return display
 
     def typesetting(self, res, title=''):
