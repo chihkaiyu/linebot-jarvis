@@ -6,7 +6,7 @@ import os
 import mysql.connector
 
 
-class DBConnector(object):
+class DatabaseConnector(object):
     """A MySQL database connector"""
 
     def __init__(self, mysql_login_info=None):
