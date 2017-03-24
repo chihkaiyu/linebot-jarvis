@@ -10,7 +10,7 @@ class DatabaseConnector(object):
     """A MySQL database connector"""
 
     def __init__(self, mysql_login_info=None):
-        if not mysql_login_info:
+        if not isinstance(mysql_login_info, dict):
             folder_name = os.path.abspath(os.pardir)
             config_path = os.path.join(folder_name, 'credential',
                                        'mysql_config.json')
