@@ -13,10 +13,10 @@ class DatabaseConnectorTest(unittest.TestCase):
                             'password': 'yurabuai99',
                             'database': 'linebot',
                             'host': 'localhost'}
-        self.db = DatabaseConnector(mysql_login_info)
+        self.db_test = DatabaseConnector(mysql_login_info)
 
     def tearDown(self):
-        self.db = None
+        self.db_test = None
 
     def test_initilized_value(self):
         pass
