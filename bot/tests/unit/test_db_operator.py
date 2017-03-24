@@ -18,6 +18,7 @@ class DatabaseConnectorTest(unittest.TestCase):
     def tearDown(self):
         self.db_test = None
         # jenkins test
+        # jenkins test 2
 
     def test_initilized_value(self):
         pass
