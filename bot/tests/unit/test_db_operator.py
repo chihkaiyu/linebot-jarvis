@@ -16,7 +16,7 @@ class DatabaseConnectorTest(unittest.TestCase):
         self.db = DatabaseConnector(mysql_login_info)
 
     def tearDown(self):
-        del self.db
+        self.db = None
 
     def test_initilized_value(self):
         pass
