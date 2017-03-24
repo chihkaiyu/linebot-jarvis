@@ -9,10 +9,10 @@ class DatabaseConnectorTest(unittest.TestCase):
 
     def setUp(self):
 
-        mysql_login_info = {'user': 'test',
+        mysql_login_info = {'user': 'bot',
                             'password': 'yurabuai99',
                             'database': 'linebot',
-                            'host': 'localhost'}
+                            'host': 'db'}
         self.db_test = DatabaseConnector(mysql_login_info)
 
     def tearDown(self):
