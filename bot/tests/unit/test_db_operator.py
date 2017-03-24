@@ -19,6 +19,7 @@ class DatabaseConnectorTest(unittest.TestCase):
         self.db_test = None
         # jenkins test
         # jenkins test 2
+        # jenkins test 3
 
     def test_initilized_value(self):
         pass
