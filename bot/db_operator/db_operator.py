@@ -51,7 +51,7 @@ class DatabaseConnector(object):
                                TARGET=self.add_single_quo(target)))
         self.cursor.execute(mysql_query)
         res = self.cursor.fetchall()
-        return res[0][0]
+        return True if res else False
 
     def is_table(self, table_name):
         """Return wheter a table exists"""
@@ -60,16 +60,17 @@ class DatabaseConnector(object):
                             .format(TABLE=table_name))
         res = self.cursor.fetchall()
         # does_exist = lambda res: True if res else False
-        return res
+        return True if res else False
 
     def query(self, table_name, column, condition):
         """Query database"""
 
-        mysql_query = self.mysql_select.format(COLUMN=column,
+        mysql_query = self.mysql_select.format(COLUMN=', '.join(column),
                                                TABLE=table_name,
                                                CONDITION=condition)
         self.cursor.execute(mysql_query)
-        return self.cursor.fetchall()[0][0]
+        res = self.cursor.fetchall()
+        return res
 
     def insert(self, table_name, data):
         """Insert a record to database"""
