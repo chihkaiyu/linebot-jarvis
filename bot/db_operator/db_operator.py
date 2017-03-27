@@ -15,7 +15,7 @@ class DatabaseConnector(object):
             config_path = os.path.join(folder_name, 'credential',
                                        'mysql_config.json')
             mysql_login_info = json.load(open(config_path))
-        self.connection = (mysql.connector.connect(**mysql_login_info))
+        self.connection = mysql.connector.connect(**mysql_login_info)
 
         self.cursor = self.connection.cursor()
         self.mysql_insert = ('INSERT INTO {TABLE}\n'

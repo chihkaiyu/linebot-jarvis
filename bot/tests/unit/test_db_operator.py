@@ -10,7 +10,7 @@ class DatabaseConnectorTest(unittest.TestCase):
 
     def setUp(self):
 
-        mysql_login_info = {'user': 'test',
+        mysql_login_info = {'user': 'bot',
                             'password': 'yurabuai99',
                             'database': 'linebot',
                             'host': '127.0.0.1'}
@@ -25,7 +25,7 @@ class DatabaseConnectorTest(unittest.TestCase):
         for cmd in sql_script:
             try:
                 self.db_test.cursor.execute(cmd)
-            except mysql.connector.errors.OperationalError:
+            except:
                 print('Command skipped: ')
 
     def tearDown(self):
@@ -56,21 +56,62 @@ class DatabaseConnectorTest(unittest.TestCase):
 
         table_name = 'USER'
         true_column = ['favorite']
-        # false_column = ['notexists']
         true_condition = 'userID = \'test\''
-        # false_condition = 'userID = \'notexists\''
+        false_condition = 'userID = \'notexists\''
 
         self.assertEqual(self.db_test.query(table_name, true_column,
                                             true_condition), [('lion')])
+        self.assertEqual(self.db_test.query(table_name, true_column,
+                                            false_condition), [])
 
     def test_insert(self):
-        pass
+        """Test inserting database"""
+
+        table_name = 'USER'
+        data = {'userID': 'testingid', 'favorite': 'testlion',
+                'lastCmd': 'I like lion very much'}
+        self.db_test.insert(table_name, data)
+        test_select_cmd = ('SELECT * FROM USER'
+                           'WHERE userID=\'testingid\'')
+
+        # True assertion
+        self.db_test.cursor.execute(test_select_cmd)
+        res = self.db_test.cursor.fetchall()
+        self.assertEqual(res,
+                         [('testingid', 'testlion', 'I like lion very much')])
+        # False assertion
+        delete_test_record = ('DELETE FROM USER'
+                              'WHERE userID=\'testingid\'')
+        self.db_test.cursor.execute(delete_test_record)
+        self.db_test.cursor.execute(test_select_cmd)
+        res = self.db_test.cursor.fetchall()
+        self.assertEqual(res, [])
 
     def test_create(self):
-        pass
+        """Test create table database"""
+
+        true_table_name = 'USER'
+        false_table_name = 'notexists'
+        self.assertTrue(self.db_test.is_table(true_table_name))
+        self.assertFalse(self.db_test.is_table(false_table_name))
 
     def test_update(self):
-        pass
+        """Update in database"""
 
+        table_name = 'USER'
+        update_data = {'favorite': 'anan', 'lastCmd': 'I love kitty'}
+        test_update_record = ('INSERT INTO USER'
+                              '(userID, favorite, lastCmd)'
+                              'VALUES'
+                              '(\'test_update\', \'haha\', \'I love lion\')')
+        self.db_test.cursor.execute(test_update_record)
+        self.db_test.update(table_name, update_data)
+        self.db_test.cursor.execute('SELECT * FROM USER'
+                                    'WHERE userID=\'test_update\'')
+        res = self.db_test.cursor.fetchall()
+        self.assertEqual(res, [('test_update', 'anan', 'I love kieey')])
+
+    '''
     def test_init(self):
         pass
+    '''
