@@ -5,6 +5,7 @@ import os
 from bot.db_operator.db_operator import DatabaseConnector
 import mysql.connector
 
+
 class DatabaseConnectorTest(unittest.TestCase):
     """Test database connector"""
 
@@ -16,6 +17,7 @@ class DatabaseConnectorTest(unittest.TestCase):
                             'host': '127.0.0.1'}
         self.db_test = DatabaseConnector(mysql_login_info)
 
+        # will creat repeat database, have to fix it
         # Load test database
         root_dir = os.path.dirname(os.path.abspath(__file__))
         with open(os.path.join(root_dir, 'test_data', 'database_test.sql'),
@@ -23,10 +25,7 @@ class DatabaseConnectorTest(unittest.TestCase):
             sql_file = fp.read()
         sql_script = sql_file.replace('\n', '').split(';')
         for cmd in sql_script:
-            try:
-                self.db_test.cursor.execute(cmd)
-            except:
-                print('Command skipped: ')
+            self.db_test.cursor.execute(cmd)
 
     def tearDown(self):
         self.db_test = None
@@ -107,6 +106,7 @@ class DatabaseConnectorTest(unittest.TestCase):
                               '(userID, favorite, lastCmd)'
                               'VALUES'
                               '(\'test_update\', \'haha\', \'I love lion\')')
+        # Insert for test
         self.db_test.cursor.execute(test_update_record)
         self.db_test.update(table_name, update_data, condition)
         self.db_test.cursor.execute('SELECT * FROM USER'
@@ -114,6 +114,10 @@ class DatabaseConnectorTest(unittest.TestCase):
         res = self.db_test.cursor.fetchall()
         self.assertEqual(res, [('test_update', 'anan', 'I love kieey')])
 
+        # Delete test record
+        delete_test_record = ('DELETE FROM USER'
+                              'WHERE userID=\'test_update\'')
+        self.db_test.cursor.execute(delete_test_record)
     '''
     def test_init(self):
         pass
