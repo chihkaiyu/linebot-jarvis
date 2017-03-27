@@ -51,7 +51,7 @@ class DatabaseConnector(object):
                                TARGET=self.add_single_quo(target)))
         self.cursor.execute(mysql_query)
         res = self.cursor.fetchall()
-        return True if res else False
+        return True if res[0][0] else False
 
     def is_table(self, table_name):
         """Return wheter a table exists"""
@@ -59,7 +59,6 @@ class DatabaseConnector(object):
         self.cursor.execute('SHOW TABLES LIKE \'{TABLE}\''
                             .format(TABLE=table_name))
         res = self.cursor.fetchall()
-        # does_exist = lambda res: True if res else False
         return True if res else False
 
     def query(self, table_name, column, condition):

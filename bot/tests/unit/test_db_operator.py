@@ -10,6 +10,7 @@ class DatabaseConnectorTest(unittest.TestCase):
     """Test database connector"""
 
     def setUp(self):
+        """Load test database"""
 
         mysql_login_info = {'user': 'bot',
                             'password': 'yurabuai99',
@@ -17,7 +18,6 @@ class DatabaseConnectorTest(unittest.TestCase):
                             'host': '127.0.0.1'}
         self.db_test = DatabaseConnector(mysql_login_info)
 
-        # will creat repeat database, have to fix it
         # Load test database
         root_dir = os.path.dirname(os.path.abspath(__file__))
         with open(os.path.join(root_dir, 'test_data', 'database_test.sql'),
@@ -28,6 +28,9 @@ class DatabaseConnectorTest(unittest.TestCase):
             self.db_test.cursor.execute(cmd)
 
     def tearDown(self):
+        """Drop test table USER"""
+
+        self.db_test.cursor.execute('DROP TABLE USER;')
         self.db_test = None
 
     def test_is_record(self):
@@ -59,9 +62,10 @@ class DatabaseConnectorTest(unittest.TestCase):
         true_column = ['favorite']
         true_condition = 'userID = \'test\''
         false_condition = 'userID = \'notexists\''
-
+        print(self.db_test.query(table_name, true_column,
+                                 true_condition))
         self.assertEqual(self.db_test.query(table_name, true_column,
-                                            true_condition), [('lion')])
+                                            true_condition), [('lion',)])
         self.assertEqual(self.db_test.query(table_name, true_column,
                                             false_condition), [])
 
@@ -72,7 +76,7 @@ class DatabaseConnectorTest(unittest.TestCase):
         data = {'userID': 'testingid', 'favorite': 'testlion',
                 'lastCmd': 'I like lion very much'}
         self.db_test.insert(table_name, data)
-        test_select_cmd = ('SELECT * FROM USER'
+        test_select_cmd = ('SELECT * FROM USER\n'
                            'WHERE userID=\'testingid\'')
 
         # True assertion
@@ -81,7 +85,7 @@ class DatabaseConnectorTest(unittest.TestCase):
         self.assertEqual(res,
                          [('testingid', 'testlion', 'I like lion very much')])
         # False assertion
-        delete_test_record = ('DELETE FROM USER'
+        delete_test_record = ('DELETE FROM USER\n'
                               'WHERE userID=\'testingid\'')
         self.db_test.cursor.execute(delete_test_record)
         self.db_test.cursor.execute(test_select_cmd)
@@ -102,20 +106,20 @@ class DatabaseConnectorTest(unittest.TestCase):
         table_name = 'USER'
         update_data = {'favorite': 'anan', 'lastCmd': 'I love kitty'}
         condition = 'userID=\'test_update\''
-        test_update_record = ('INSERT INTO USER'
-                              '(userID, favorite, lastCmd)'
-                              'VALUES'
-                              '(\'test_update\', \'haha\', \'I love lion\')')
+        test_update_record = ('INSERT INTO USER\n'
+                              '(userID, favorite, lastCmd)\n'
+                              'VALUES\n'
+                              '(\'test_update\', \'haha\', \'I love lion\')\n')
         # Insert for test
         self.db_test.cursor.execute(test_update_record)
         self.db_test.update(table_name, update_data, condition)
-        self.db_test.cursor.execute('SELECT * FROM USER'
+        self.db_test.cursor.execute('SELECT * FROM USER\n'
                                     'WHERE userID=\'test_update\'')
         res = self.db_test.cursor.fetchall()
-        self.assertEqual(res, [('test_update', 'anan', 'I love kieey')])
+        self.assertEqual(res, [('test_update', 'anan', 'I love kitty')])
 
         # Delete test record
-        delete_test_record = ('DELETE FROM USER'
+        delete_test_record = ('DELETE FROM USER\n'
                               'WHERE userID=\'test_update\'')
         self.db_test.cursor.execute(delete_test_record)
     '''
