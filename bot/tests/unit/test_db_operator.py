@@ -100,12 +100,13 @@ class DatabaseConnectorTest(unittest.TestCase):
 
         table_name = 'USER'
         update_data = {'favorite': 'anan', 'lastCmd': 'I love kitty'}
+        condition = 'userID=\'test_update\''
         test_update_record = ('INSERT INTO USER'
                               '(userID, favorite, lastCmd)'
                               'VALUES'
                               '(\'test_update\', \'haha\', \'I love lion\')')
         self.db_test.cursor.execute(test_update_record)
-        self.db_test.update(table_name, update_data)
+        self.db_test.update(table_name, update_data, condition)
         self.db_test.cursor.execute('SELECT * FROM USER'
                                     'WHERE userID=\'test_update\'')
         res = self.db_test.cursor.fetchall()
