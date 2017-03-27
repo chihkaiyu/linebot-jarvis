@@ -5,7 +5,6 @@ import os
 from bot.db_operator.db_operator import DatabaseConnector
 import mysql.connector
 
-# ssh test
 class DatabaseConnectorTest(unittest.TestCase):
     """Test database connector"""
 
