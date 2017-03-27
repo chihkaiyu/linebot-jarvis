@@ -39,8 +39,10 @@ class DatabaseConnectorTest(unittest.TestCase):
         false_target = 'notexists'
         true_target = 'test'
 
-        self.assertFalse(self.db_test.is_record(table_name, column, false_target))
-        self.assertTrue(self.db_test.is_record(table_name, column, true_target))
+        self.assertFalse(self.db_test.is_record(table_name, column,
+                                                false_target))
+        self.assertTrue(self.db_test.is_record(table_name, column,
+                                               true_target))
 
     def test_is_table(self):
         """Test whether a table exists"""
