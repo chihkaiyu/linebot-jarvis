@@ -20,7 +20,7 @@ class MetroParser(object):
                   'r', encoding='utf8') as fp:
             self.all_metro_code = json.load(fp)
 
-    def approximat_matching(self, query):
+    def approximate_matching(self, query):
         """Approximate matching for station name"""
 
         # Approximate matching
