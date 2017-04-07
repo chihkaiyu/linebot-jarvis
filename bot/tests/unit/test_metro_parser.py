@@ -47,4 +47,3 @@ class MetroParserTest(unittest.TestCase):
         self.metro_parser.query = self.test_data['query']
         display = self.metro_parser.typesetting(self.test_data['parsed_data'])
         self.assertEqual(display, self.test_data['display'])
-
