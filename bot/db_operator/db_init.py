@@ -1,7 +1,7 @@
 import sys
-import db_operator
+from db_operator import DatabaseConnector
 
-db = db_operator.DBConnector()
+db = DatabaseConnector()
 db.table_init('USER')
 del db
 sys.exit()

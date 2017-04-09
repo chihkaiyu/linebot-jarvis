@@ -13,22 +13,26 @@ from fuzzywuzzy import process
 class WeatherParser(object):
     """A class get weather condition, and parse data"""
 
-    def __init__(self, query):
-        # Preprocess
-        query[0] = query[0].replace('台', '臺')
-        query[1] = query[1].replace('台', '臺')
-
+    def __init__(self):
         # Get county code
         # root_dir = os.environ.get('ROOT_DIR')
         folder_name = os.path.dirname(os.path.abspath(__file__))
         code_file_path = os.path.join(folder_name, 'dist_info.json')
-        code_file = json.load(open(code_file_path, 'r', encoding='utf8'))
+        self.code_file = json.load(open(code_file_path, 'r', encoding='utf8'))
+
+    def approximate_matching(self, query):
+        """Approximate matching"""
+
+        # Preprocess
+        query[0] = query[0].replace('台', '臺')
+        query[1] = query[1].replace('台', '臺')
 
         # Approximate matching
-        query[0] = process.extractOne(query[0], code_file.keys())[0]
-        query[1] = process.extractOne(query[1], code_file[query[0]].keys())[0]
+        query[0] = process.extractOne(query[0], self.code_file.keys())[0]
+        query[1] = process.extractOne(query[1],
+                                      self.code_file[query[0]].keys())[0]
         self.query = query
-        self.county_code = code_file[query[0]][query[1]]['code']
+        self.county_code = self.code_file[query[0]][query[1]]['code']
 
         # Attribute
         self.three_hour_website = ('http://www.cwb.gov.tw/V7/forecast/town368'
@@ -39,7 +43,7 @@ class WeatherParser(object):
                                   .format(county_code=self.county_code))
         self.air_website = ('http://taqm.epa.gov.tw/taqm/aqs.ashx?'
                             'lang=tw&act=aqi-epa')
-        self.station_id = int(code_file[query[0]][query[1]]['station_id'])
+        self.station_id = int(self.code_file[query[0]][query[1]]['station_id'])
 
     def request_weather(self, url):
         """Send request to website"""
