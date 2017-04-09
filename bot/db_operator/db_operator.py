@@ -11,8 +11,9 @@ class DatabaseConnector(object):
 
     def __init__(self, mysql_login_info=None):
         if not isinstance(mysql_login_info, dict):
-            folder_name = os.path.abspath(os.pardir)
-            config_path = os.path.join(folder_name, 'credential',
+            folder_name = os.path.dirname(os.path.abspath(__file__))
+            root_folder = ospath.dirname(folder_name)
+            config_path = os.path.join(root_folder, 'credential',
                                        'mysql_config.json')
             mysql_login_info = json.load(open(config_path))
         self.connection = mysql.connector.connect(**mysql_login_info)
