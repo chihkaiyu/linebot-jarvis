@@ -9,7 +9,6 @@ build:
 	# docker rmi `docker images | grep '^<none>' | awk '{print $$3}'`
 upgrade:
 	make rm
-	make build
 	make run
 logs:
 	docker logs linebotjarvis_bot_1
