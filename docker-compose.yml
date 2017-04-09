@@ -15,6 +15,8 @@ services:
     bot:
         image: linebot
         #build: /home/kai/linebot-jarvis
+        volumes:
+            - ./butterha:/opt/butterha
         ports:
             - "443:443"
         restart: always

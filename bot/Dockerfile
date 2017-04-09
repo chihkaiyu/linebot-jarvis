@@ -22,6 +22,9 @@ COPY db_operator /opt/linebot/db_operator
 RUN mkdir /opt/html
 COPY index.html /opt/html/index.html
 
+# butterha resouces
+RUN mkdir /opt/butterha
+
 # credential
 COPY credential /opt/linebot/credential
 
