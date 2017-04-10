@@ -3,6 +3,7 @@ mysqlbot_data/
 .DS_Store
 ssl/
 credential/
+butterha/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

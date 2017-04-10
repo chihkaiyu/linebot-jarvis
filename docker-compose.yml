@@ -4,19 +4,17 @@ services:
     mysqlbot:
         image: mysql:5.6
         volumes:
-            - ./mysqlbot/mysqlbot_data:/var/lib/mysql
-            - ./bot/conf/my.cnf:/etc/mysql/my.cnf
+            - /home/kai/linebot-jarvis/mysqlbot/:/var/lib/mysql
         restart: always
-        environment:
-            MYSQL_ROOT_PASSWORD: 09wfjvdedr09yopbn
-            MYSQL_DATABASE: linebot
-            MYSQL_USER: bot
-            MYSQL_PASSWORD: yurabuai99
+        #environment:
+        #    MYSQL_ROOT_PASSWORD: 09wfjvdedr09yopbn
+        #    MYSQL_DATABASE: linebot
+        #    MYSQL_USER: bot
+        #    MYSQL_PASSWORD: yurabuai99
     bot:
         image: linebot
-        #build: /home/kai/linebot-jarvis
         volumes:
-            - ./butterha:/opt/butterha
+            - /home/kai/linebot-jarvis/butterha:/opt/butterha
         ports:
             - "443:443"
         restart: always
