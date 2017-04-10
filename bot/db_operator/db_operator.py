@@ -70,7 +70,7 @@ class DatabaseConnector(object):
                                                CONDITION=condition)
         self.cursor.execute(mysql_query)
         res = self.cursor.fetchall()
-        return res
+        return res[0][0]
 
     def insert(self, table_name, data):
         """Insert a record to database"""
