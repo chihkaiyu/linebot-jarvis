@@ -100,12 +100,15 @@ class LineServer(object):
             self.db.update(table_name, data, 'userID=\'{}\''.format(user_id))
 
             if command[0] == '天氣':
+                # parse command
                 if len(command) == 1:
-                    fav = self.db.query(table_name, ['favorite'], 'userID=\'{}\''
-                                        .format(user_id))
+                    fav = self.db.query(table_name, ['favorite'],
+                                        'userID=\'{}\''.format(user_id))
                     command += fav.split()
                 elif len(command) == 2:
                     command.append(command[-1])
+
+                # weather parser progress
                 self.weather.approximate_matching(command[1:])
                 raw_data = self.weather.request_weather(
                     self.weather.three_hour_website)
