@@ -101,7 +101,7 @@ class LineServer(object):
 
             if command[0] == '天氣':
                 if len(command) == 1:
-                    fav = self.db.query(table_name, 'favorite', 'userID=\'{}\''
+                    fav = self.db.query(table_name, ['favorite'], 'userID=\'{}\''
                                         .format(user_id))
                     command += fav.split()
                 elif len(command) == 2:
