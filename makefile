@@ -5,7 +5,7 @@ run:
 in:
 	docker exec -ti linebotjarvis_bot_1 /bin/bash
 build:
-	docker build -t linebot /home/kai/linebot-jarvis/bot
+	docker build -t linebot ./bot
 	# docker rmi `docker images | grep '^<none>' | awk '{print $$3}'`
 upgrade:
 	make rm
