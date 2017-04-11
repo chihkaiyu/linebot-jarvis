@@ -6,11 +6,11 @@ services:
         volumes:
             - /home/kai/linebot-jarvis/mysqlbot:/var/lib/mysql
         restart: always
-        #environment:
-        #    MYSQL_ROOT_PASSWORD: 09wfjvdedr09yopbn
-        #    MYSQL_DATABASE: linebot
-        #    MYSQL_USER: bot
-        #    MYSQL_PASSWORD: yurabuai99
+        environment:
+            MYSQL_ROOT_PASSWORD: 09wfjvdedr09yopbn
+            MYSQL_DATABASE: linebot
+            MYSQL_USER: bot
+            MYSQL_PASSWORD: yurabuai99
     bot:
         image: linebot
         volumes:
