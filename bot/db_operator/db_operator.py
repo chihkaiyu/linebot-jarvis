@@ -3,7 +3,7 @@
 
 import json
 import os
-import mysql.connector
+import pymysql
 
 
 class DatabaseConnector(object):
@@ -16,7 +16,7 @@ class DatabaseConnector(object):
             config_path = os.path.join(root_folder, 'credential',
                                        'mysql_config.json')
             mysql_login_info = json.load(open(config_path))
-        self.connection = mysql.connector.connect(**mysql_login_info)
+        self.connection = pymysql.connect(**mysql_login_info)
 
         self.cursor = self.connection.cursor()
         self.mysql_insert = ('INSERT INTO {TABLE}\n'

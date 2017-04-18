@@ -3,7 +3,6 @@ import json
 import os
 
 from bot.db_operator.db_operator import DatabaseConnector
-import mysql.connector
 
 class DatabaseConnectorTest(unittest.TestCase):
     """Test database connector"""
@@ -22,7 +21,7 @@ class DatabaseConnectorTest(unittest.TestCase):
         with open(os.path.join(root_dir, 'test_data', 'database_test.sql'),
                   'r', encoding='utf8') as fp:
             sql_file = fp.read()
-        sql_script = sql_file.replace('\n', '').split(';')
+        sql_script = sql_file.replace('\n', '').split(';')[:-1]
         for cmd in sql_script:
             self.db_test.cursor.execute(cmd)
 
@@ -30,7 +29,7 @@ class DatabaseConnectorTest(unittest.TestCase):
         """Drop test table USER"""
 
         self.db_test.cursor.execute('DROP TABLE USER;')
-        self.db_test = None
+        # self.db_test = None
 
     def test_is_record(self):
         """Test whether a record exists"""
@@ -64,7 +63,7 @@ class DatabaseConnectorTest(unittest.TestCase):
         print(self.db_test.query(table_name, true_column,
                                  true_condition))
         self.assertEqual(self.db_test.query(table_name, true_column,
-                                            true_condition), [('lion',)])
+                                            true_condition), 'lion')
         self.assertEqual(self.db_test.query(table_name, true_column,
                                             false_condition), [])
 
@@ -82,14 +81,15 @@ class DatabaseConnectorTest(unittest.TestCase):
         self.db_test.cursor.execute(test_select_cmd)
         res = self.db_test.cursor.fetchall()
         self.assertEqual(res,
-                         [('testingid', 'testlion', 'I like lion very much')])
+                         (('testingid', 'testlion', 'I like lion very much'), )
+                         )
         # False assertion
         delete_test_record = ('DELETE FROM USER\n'
                               'WHERE userID=\'testingid\'')
         self.db_test.cursor.execute(delete_test_record)
         self.db_test.cursor.execute(test_select_cmd)
         res = self.db_test.cursor.fetchall()
-        self.assertEqual(res, [])
+        self.assertEqual(res, ())
 
     def test_create(self):
         """Test create table database"""
@@ -115,7 +115,7 @@ class DatabaseConnectorTest(unittest.TestCase):
         self.db_test.cursor.execute('SELECT * FROM USER\n'
                                     'WHERE userID=\'test_update\'')
         res = self.db_test.cursor.fetchall()
-        self.assertEqual(res, [('test_update', 'anan', 'I love kitty')])
+        self.assertEqual(res, (('test_update', 'anan', 'I love kitty'), ))
 
         # Delete test record
         delete_test_record = ('DELETE FROM USER\n'
