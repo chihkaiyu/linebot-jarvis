@@ -45,13 +45,14 @@ class LineServer(object):
         # parser instance
         self.weather = WeatherParser()
         self.metro = MetroParser()
-        self.db = DatabaseConnector()
+        # self.db = DatabaseConnector()
 
     def __del__(self):
         print('Destroyed')
 
     def callback(self, environ, start_response):
         """Process every line message"""
+        db = DatabaseConnector()
 
         # check request path
         if environ['PATH_INFO'] != '/callback':
@@ -83,9 +84,9 @@ class LineServer(object):
         user_id = events[0].source.user_id
 
         # create user if not in database
-        if not self.db.is_record(table_name, 'userID', user_id):
+        if not db.is_record(table_name, 'userID', user_id):
             data = {'userID': user_id}
-            self.db.insert(table_name, data)
+            db.insert(table_name, data)
 
         # if event is MessageEvent and message is TextMessage, then echo text
         for event in events:
@@ -97,12 +98,12 @@ class LineServer(object):
             command = event.message.text.split()
 
             data = {'lastCmd': event.message.text}
-            self.db.update(table_name, data, 'userID=\'{}\''.format(user_id))
+            db.update(table_name, data, 'userID=\'{}\''.format(user_id))
 
             if command[0] == '天氣':
                 # parse command
                 if len(command) == 1:
-                    fav = self.db.query(table_name, ['favorite'],
+                    fav = db.query(table_name, ['favorite'],
                                         'userID=\'{}\''.format(user_id))
                     command += fav.split()
                 elif len(command) == 2:
@@ -126,7 +127,7 @@ class LineServer(object):
                     display = self.metro.typesetting(parsed_data)
             elif command[0] == '設定':
                 data = {'favorite': ' '.join(command[1:])}
-                self.db.update(table_name, data,
+                db.update(table_name, data,
                                'userID=\'{}\''.format(user_id))
                 display = '已經您的常用地點設為：{}'.format(' '.join(command[1:]))
             else:
@@ -142,6 +143,7 @@ class LineServer(object):
             )
 
         start_response('200 OK', [])
+        del db
         return self.create_body('OK')
 
     def create_body(self, text):
