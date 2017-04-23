@@ -10,7 +10,6 @@ class WeatherParserTest(unittest.TestCase):
     """Test weather_parser"""
 
     def setUp(self):
-        self.wea = WeatherParser(['台北', '大安'])
 
         # Load test data
         root_dir = os.path.dirname(os.path.abspath(__file__))
@@ -34,12 +33,14 @@ class WeatherParserTest(unittest.TestCase):
             test_data['parsed_data'] = self.string_to_bs_format(
                 test_data['parsed_data']
             )
+        self.wea = WeatherParser()
+        self.wea.approximate_matching(['台北', '大安'])
 
     def tearDown(self):
         self.wea = None
 
-    def test_initialized_object(self):
-        """Test initialized value of WeatherParser object"""
+    def test_approximate_matching(self):
+        """Test approximate mathcing"""
 
         self.assertEqual(self.wea.query[0], '臺北市')
         self.assertEqual(self.wea.query[1], '大安區')
