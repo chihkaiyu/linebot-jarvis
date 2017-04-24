@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from weather_parser.weather import WeatherParser
 from metro_parser.metro import MetroParser
 from db_operator.db_operator import DatabaseConnector
