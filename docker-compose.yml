@@ -5,7 +5,7 @@ services:
         image: mariadb:10.1.22
         volumes:
             - /home/kai/linebot-jarvis/mysqlbot:/var/lib/mysql
-            - /home/kai/jenkins-build/workspace/linebot_jarvis/bot/conf:/etc/mysql/my.cnf
+            - /home/kai/jenkins-build/workspace/linebot_jarvis/bot/conf/my.cnf:/etc/mysql/my.cnf
         restart: always
         environment:
             MYSQL_ROOT_PASSWORD: 09wfjvdedr09yopbn
