@@ -1,6 +1,9 @@
 from weather_parser.weather import WeatherParser
 from metro_parser.metro import MetroParser
 from db_operator.db_operator import DatabaseConnector
+from linebot.models import (
+    MessageEvent, TextMessage, TextSendMessage
+)
 
 class CommandParser(object):
     """Parse incoming command"""
