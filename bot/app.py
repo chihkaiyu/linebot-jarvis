@@ -5,6 +5,7 @@ import sys
 import os
 from configparser import ConfigParser
 from command_parser.command_parser import CommandParser
+from db_operator.db_operator import DatabaseConnector
 
 
 from linebot import (
@@ -12,6 +13,9 @@ from linebot import (
 )
 from linebot.exceptions import (
     InvalidSignatureError
+)
+from linebot.models import (
+    MessageEvent, TextMessage, TextSendMessage
 )
 from linebot.utils import PY3
 
@@ -71,8 +75,29 @@ class LineServer(object):
             start_response('400 Bad Request', [])
             return self.create_body('Bad Request')
 
-        self.command.parse_command(events, self.line_bot_api)
+        db = DatabaseConnector()
+        table_name = 'USER'
+        user_id = events[0].source.user_id
 
+        # create user if not in database
+        if not db.is_record(table_name, 'userID', user_id):
+            data = {'userID': user_id}
+            db.insert(table_name, data)
+
+        for event in events:
+            if not isinstance(event, MessageEvent):
+                display = 'WOW, that\'s new!'
+                continue
+            if not isinstance(event.message, TextMessage):
+                display = 'WOW, that\'s new!'
+                continue
+            # command = event.message.text
+            display = self.command.parse_command(event, db)
+
+            self.line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text=display))
+        del db
         start_response('200 OK', [])
         return self.create_body('OK')
 
