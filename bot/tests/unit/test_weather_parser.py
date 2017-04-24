@@ -52,13 +52,13 @@ class WeatherParserTest(unittest.TestCase):
 
         # Test three hour raw data successful
         three_hour_raw_data = (self.wea.request_weather(
-            self.wea.three_hour_website
+            self.wea.three_hour_website.format(CODE=self.wea.county_code)
         ))
         self.assertIsNotNone(three_hour_raw_data)
 
         # Test seven day raw data successful
         seven_day_raw_data = (self.wea.request_weather(
-            self.wea.seven_day_website
+            self.wea.seven_day_website.format(CODE=self.wea.county_code)
         ))
         self.assertIsNotNone(seven_day_raw_data)
 

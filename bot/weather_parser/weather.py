@@ -20,9 +20,9 @@ class WeatherParser(object):
         code_file_path = os.path.join(folder_name, 'dist_info.json')
         self.code_file = json.load(open(code_file_path, 'r', encoding='utf8'))
         self.three_hour_website = ('http://www.cwb.gov.tw/V7/forecast/town368'
-                                   '/3Hr/{county_code}.htm')
+                                   '/3Hr/{CODE}.htm')
         self.seven_day_website = ('http://www.cwb.gov.tw/V7/forecast/town368'
-                                  '/7Day/{county_code}.htm')
+                                  '/7Day/{CODE}.htm')
         self.air_website = ('http://taqm.epa.gov.tw/taqm/aqs.ashx?'
                             'lang=tw&act=aqi-epa')
 
@@ -37,7 +37,7 @@ class WeatherParser(object):
         query[0] = process.extractOne(query[0], self.code_file.keys())[0]
         query[1] = process.extractOne(query[1],
                                       self.code_file[query[0]].keys())[0]
-        self.query = query
+        self.query = ' '.join(query)
         self.county_code = self.code_file[query[0]][query[1]]['code']
 
         # Attribute
@@ -56,7 +56,6 @@ class WeatherParser(object):
     def request_weather(self, url):
         """Send request to website"""
 
-        url =
         raw_data = urlopen(url)
         return raw_data
 
