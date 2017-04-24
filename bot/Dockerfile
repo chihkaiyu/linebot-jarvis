@@ -16,6 +16,7 @@ COPY app.py /opt/linebot/app.py
 COPY weather_parser /opt/linebot/weather_parser
 COPY metro_parser /opt/linebot/metro_parser
 COPY db_operator /opt/linebot/db_operator
+COPY command_parser /opt/linebot/command_parser
 
 # write log into file
 #RUN unlink /var/log/nginx/access.log
