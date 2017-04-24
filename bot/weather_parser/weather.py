@@ -19,6 +19,12 @@ class WeatherParser(object):
         folder_name = os.path.dirname(os.path.abspath(__file__))
         code_file_path = os.path.join(folder_name, 'dist_info.json')
         self.code_file = json.load(open(code_file_path, 'r', encoding='utf8'))
+        self.three_hour_website = ('http://www.cwb.gov.tw/V7/forecast/town368'
+                                   '/3Hr/{CODE}.htm')
+        self.seven_day_website = ('http://www.cwb.gov.tw/V7/forecast/town368'
+                                  '/7Day/{CODE}.htm')
+        self.air_website = ('http://taqm.epa.gov.tw/taqm/aqs.ashx?'
+                            'lang=tw&act=aqi-epa')
 
     def approximate_matching(self, query):
         """Approximate matching"""
@@ -31,10 +37,11 @@ class WeatherParser(object):
         query[0] = process.extractOne(query[0], self.code_file.keys())[0]
         query[1] = process.extractOne(query[1],
                                       self.code_file[query[0]].keys())[0]
-        self.query = query
+        self.query = ' '.join(query)
         self.county_code = self.code_file[query[0]][query[1]]['code']
 
         # Attribute
+        '''
         self.three_hour_website = ('http://www.cwb.gov.tw/V7/forecast/town368'
                                    '/3Hr/{county_code}.htm'
                                    .format(county_code=self.county_code))
@@ -43,6 +50,7 @@ class WeatherParser(object):
                                   .format(county_code=self.county_code))
         self.air_website = ('http://taqm.epa.gov.tw/taqm/aqs.ashx?'
                             'lang=tw&act=aqi-epa')
+        '''
         self.station_id = int(self.code_file[query[0]][query[1]]['station_id'])
 
     def request_weather(self, url):

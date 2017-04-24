@@ -10,7 +10,6 @@ class WeatherParserTest(unittest.TestCase):
     """Test weather_parser"""
 
     def setUp(self):
-        self.wea = WeatherParser(['台北', '大安'])
 
         # Load test data
         root_dir = os.path.dirname(os.path.abspath(__file__))
@@ -34,12 +33,14 @@ class WeatherParserTest(unittest.TestCase):
             test_data['parsed_data'] = self.string_to_bs_format(
                 test_data['parsed_data']
             )
+        self.wea = WeatherParser()
+        self.wea.approximate_matching(['台北', '大安'])
 
     def tearDown(self):
         self.wea = None
 
-    def test_initialized_object(self):
-        """Test initialized value of WeatherParser object"""
+    def test_approximate_matching(self):
+        """Test approximate mathcing"""
 
         self.assertEqual(self.wea.query[0], '臺北市')
         self.assertEqual(self.wea.query[1], '大安區')
@@ -51,13 +52,13 @@ class WeatherParserTest(unittest.TestCase):
 
         # Test three hour raw data successful
         three_hour_raw_data = (self.wea.request_weather(
-            self.wea.three_hour_website
+            self.wea.three_hour_website.format(CODE=self.wea.county_code)
         ))
         self.assertIsNotNone(three_hour_raw_data)
 
         # Test seven day raw data successful
         seven_day_raw_data = (self.wea.request_weather(
-            self.wea.seven_day_website
+            self.wea.seven_day_website.format(CODE=self.wea.county_code)
         ))
         self.assertIsNotNone(seven_day_raw_data)
 
