@@ -73,7 +73,7 @@ class LineServer(object):
         except InvalidSignatureError:
             start_response('400 Bad Request', [])
             return self.create_body('Bad Request')
-        
+
         self.command.parse_command(events, self.line_bot_api)
 
         start_response('200 OK', [])
