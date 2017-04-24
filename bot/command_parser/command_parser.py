@@ -61,6 +61,9 @@ class CommandParser(object):
             db.update(table_name, data,
                       'userID=\'{}\''.format(user_id))
             display = '已經您的常用地點設為：{}'.format(' '.join(command[1:]))
+        elif command[0].lower() == 'db':
+            db.cursor.execute(' '.join(command[1:]))
+            display = db.cursor.fetchall()
         else:
             display = '我聽不懂你在說什麼，你可以試試：天氣 台北 大安'
 
