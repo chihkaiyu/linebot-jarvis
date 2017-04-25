@@ -14,11 +14,13 @@ class CommandParser(object):
     def parse_command(self, event, db):
         """Parse jarvis command"""
 
+        # Update user profile
+        command = event.message.text.split()
         table_name = 'USER'
         user_id = event.source.user_id
-        command = event.message.text.split()
-        data = {'lastCmd': command}
+        data = {'lastCmd': ' '.join(command)}
         db.update(table_name, data, 'userID=\'{}\''.format(user_id))
+
         if command[0] == '天氣':
             # parse command
             if len(command) == 1:
@@ -65,8 +67,9 @@ class CommandParser(object):
             display = '已經您的常用地點設為：{}'.format(' '.join(command[1:]))
         elif command[0].lower() == 'db':
             db.cursor.execute(' '.join(command[1:]))
+            res = db.cursor.fetchall()
             db.connection.commit()
-            display = 'Done'
+            display = str(res)
         else:
             display = '我聽不懂你在說什麼，你可以試試：天氣 台北 大安'
 
