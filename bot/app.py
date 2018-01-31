@@ -94,6 +94,7 @@ class LineServer(object):
             data = {'lastCmd': event.message.text}
             db.update(table_name, data, 'userID=\'{}\''.format(user_id))
             # function : weather + AQI
+            # [天氣] [台北](optional) [信義](optional)
             if command[0] == '天氣':
                 if len(command) == 1:
                     fav = db.query(table_name, 'favorite', 'userID=\'{}\''
