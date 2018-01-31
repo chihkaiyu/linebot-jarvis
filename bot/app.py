@@ -93,7 +93,7 @@ class LineServer(object):
 
             data = {'lastCmd': event.message.text}
             db.update(table_name, data, 'userID=\'{}\''.format(user_id))
-
+            # function : weather + AQI
             if command[0] == '天氣':
                 if len(command) == 1:
                     fav = db.query(table_name, 'favorite', 'userID=\'{}\''
@@ -102,11 +102,14 @@ class LineServer(object):
                 elif len(command) == 2:
                     command.append(command[-1])
                 display = weather.getWeather(command[1:])
+            # function : metro
+            # [捷運] [stop1] [stop2]
             elif command[0] == '捷運':
                 if len(command) < 3:
                     display = '請輸入兩個車站。'
                 else:
                     display = metro.getDuration(command[1:])
+            # function : setting
             elif command[0] == '設定':
                 data = {'favorite': ' '.join(command[1:])}
                 db.update(table_name, data, 'userID=\'{}\''.format(user_id))
